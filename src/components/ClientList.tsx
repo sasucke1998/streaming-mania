@@ -7,6 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { MessageCircle } from "lucide-react";
 
 interface Client {
   id: string;
@@ -24,6 +25,15 @@ interface ClientListProps {
 }
 
 export function ClientList({ clients, onEdit, onTogglePaid }: ClientListProps) {
+  const openWhatsApp = (phone: string) => {
+    // Eliminar cualquier carácter que no sea número
+    const cleanPhone = phone.replace(/\D/g, '');
+    // Crear el enlace de WhatsApp
+    const whatsappUrl = `https://wa.me/${cleanPhone}`;
+    // Abrir en una nueva pestaña
+    window.open(whatsappUrl, '_blank');
+  };
+
   return (
     <div className="rounded-md border mt-6">
       <Table>
@@ -44,6 +54,15 @@ export function ClientList({ clients, onEdit, onTogglePaid }: ClientListProps) {
               <TableCell>{client.pin}</TableCell>
               <TableCell>{client.phone}</TableCell>
               <TableCell className="text-right space-x-2">
+                <Button
+                  onClick={() => openWhatsApp(client.phone)}
+                  variant="outline"
+                  size="sm"
+                  className="bg-green-500 hover:bg-green-600 text-white"
+                >
+                  <MessageCircle className="w-4 h-4 mr-1" />
+                  WhatsApp
+                </Button>
                 <Button
                   onClick={() => onEdit(client.id)}
                   variant="outline"
