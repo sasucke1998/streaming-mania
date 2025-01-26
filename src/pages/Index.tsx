@@ -2,8 +2,9 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Stats } from "@/components/Stats";
 import { ClientList } from "@/components/ClientList";
+import { AccountList } from "@/components/AccountList";
 import { Monitor } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 // Mock data - replace with real data later
 const initialClients = [
@@ -25,8 +26,25 @@ const initialClients = [
   },
 ];
 
+const initialAccounts = [
+  {
+    platform: "Netflix",
+    email: "sasuckeking@gmail.com",
+    paidUsers: 1,
+    totalUsers: 1,
+  },
+  {
+    platform: "Disney+",
+    email: "nelsonmarketingdigital@gmail.com",
+    paidUsers: 1,
+    totalUsers: 1,
+  },
+];
+
 const Index = () => {
   const [clients, setClients] = useState(initialClients);
+  const [accounts, setAccounts] = useState(initialAccounts);
+  const [activeView, setActiveView] = useState<"dashboard" | "accounts">("dashboard");
   const { toast } = useToast();
 
   const stats = {
@@ -39,6 +57,13 @@ const Index = () => {
     toast({
       title: "Editar cliente",
       description: "Funcionalidad de edición en desarrollo",
+    });
+  };
+
+  const handleEditAccount = (email: string) => {
+    toast({
+      title: "Editar cuenta",
+      description: "Funcionalidad de edición de cuenta en desarrollo",
     });
   };
 
@@ -66,27 +91,48 @@ const Index = () => {
           <h1 className="text-3xl font-bold text-blue-500">Sistema de Streaming</h1>
         </div>
         <div className="flex gap-2">
-          <Button variant="default" className="bg-blue-500 hover:bg-blue-600">
+          <Button 
+            variant={activeView === "dashboard" ? "default" : "outline"}
+            className={activeView === "dashboard" ? "bg-blue-500 hover:bg-blue-600" : ""}
+            onClick={() => setActiveView("dashboard")}
+          >
             Dashboard
           </Button>
-          <Button variant="outline">Cuentas</Button>
-          <Button variant="outline">+ Nueva Cuenta</Button>
           <Button 
-            variant="outline" 
-            onClick={handleMarkAllUnpaid}
-            className="ml-auto"
+            variant={activeView === "accounts" ? "default" : "outline"}
+            className={activeView === "accounts" ? "bg-blue-500 hover:bg-blue-600" : ""}
+            onClick={() => setActiveView("accounts")}
           >
-            Marcar Todo Como No Pagado
+            Cuentas
           </Button>
+          <Button variant="outline">+ Nueva Cuenta</Button>
+          {activeView === "dashboard" && (
+            <Button 
+              variant="outline" 
+              onClick={handleMarkAllUnpaid}
+              className="ml-auto"
+            >
+              Marcar Todo Como No Pagado
+            </Button>
+          )}
         </div>
       </header>
 
-      <Stats {...stats} />
-      <ClientList 
-        clients={clients}
-        onEdit={handleEdit}
-        onTogglePaid={handleTogglePaid}
-      />
+      {activeView === "dashboard" ? (
+        <>
+          <Stats {...stats} />
+          <ClientList 
+            clients={clients}
+            onEdit={handleEdit}
+            onTogglePaid={handleTogglePaid}
+          />
+        </>
+      ) : (
+        <AccountList 
+          accounts={accounts}
+          onEdit={handleEditAccount}
+        />
+      )}
     </div>
   );
 };
