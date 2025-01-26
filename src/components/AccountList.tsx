@@ -6,9 +6,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Mail, Key, Trash2 } from "lucide-react";
+import { Mail, Key, Trash2, ChevronDown } from "lucide-react";
 import { AccountClientList } from "./AccountClientList";
 import { useToast } from "@/hooks/use-toast";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { useState } from "react";
 
 interface Account {
   platform: string;
@@ -33,6 +35,7 @@ interface AccountListProps {
 
 export function AccountList({ accounts, onEdit, onDelete }: AccountListProps) {
   const { toast } = useToast();
+  const [openAccounts, setOpenAccounts] = useState<string[]>([]);
 
   const handleDelete = (email: string) => {
     if (window.confirm("¿Estás seguro de que deseas eliminar esta cuenta y todos sus clientes asociados?")) {
@@ -42,6 +45,14 @@ export function AccountList({ accounts, onEdit, onDelete }: AccountListProps) {
         description: "La cuenta y sus clientes han sido eliminados exitosamente",
       });
     }
+  };
+
+  const toggleAccount = (email: string) => {
+    setOpenAccounts(prev => 
+      prev.includes(email) 
+        ? prev.filter(e => e !== email)
+        : [...prev, email]
+    );
   };
 
   return (
@@ -87,7 +98,22 @@ export function AccountList({ accounts, onEdit, onDelete }: AccountListProps) {
               <div className="flex items-center justify-between text-sm text-gray-500">
                 <span>{account.paidUsers}/{account.totalUsers} Pagados</span>
               </div>
-              <AccountClientList clients={account.clients} />
+              <Collapsible open={openAccounts.includes(account.email)}>
+                <CollapsibleTrigger 
+                  asChild
+                  onClick={() => toggleAccount(account.email)}
+                >
+                  <Button variant="outline" className="w-full flex items-center justify-between">
+                    <span>Ver Clientes</span>
+                    <ChevronDown className={`h-4 w-4 transform transition-transform ${
+                      openAccounts.includes(account.email) ? 'rotate-180' : ''
+                    }`} />
+                  </Button>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <AccountClientList clients={account.clients} />
+                </CollapsibleContent>
+              </Collapsible>
             </div>
           </CardContent>
         </Card>
