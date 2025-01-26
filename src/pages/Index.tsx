@@ -30,14 +30,36 @@ const initialAccounts = [
   {
     platform: "Netflix",
     email: "sasuckeking@gmail.com",
+    password: "gcdegg",
     paidUsers: 1,
     totalUsers: 1,
+    clients: [
+      {
+        id: "1",
+        name: "Kiko",
+        platform: "Netflix",
+        pin: "5456",
+        phone: "58860558",
+        isPaid: true,
+      }
+    ],
   },
   {
     platform: "Disney+",
     email: "nelsonmarketingdigital@gmail.com",
+    password: "disney123",
     paidUsers: 1,
     totalUsers: 1,
+    clients: [
+      {
+        id: "2",
+        name: "Juan Jose",
+        platform: "Disney+",
+        pin: "5659",
+        phone: "+18097532939",
+        isPaid: true,
+      }
+    ],
   },
 ];
 
@@ -80,6 +102,14 @@ const Index = () => {
     toast({
       title: "Actualizado",
       description: "Todos los clientes han sido marcados como no pagados",
+    });
+  };
+
+  const handleDeleteAccount = (email: string) => {
+    setAccounts(accounts.filter(account => account.email !== email));
+    toast({
+      title: "Cuenta eliminada",
+      description: "La cuenta y sus clientes han sido eliminados exitosamente",
     });
   };
 
@@ -131,6 +161,7 @@ const Index = () => {
         <AccountList 
           accounts={accounts}
           onEdit={handleEditAccount}
+          onDelete={handleDeleteAccount}
         />
       )}
     </div>
