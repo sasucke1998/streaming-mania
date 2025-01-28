@@ -1,5 +1,6 @@
 import React from "react";
-import { User } from "lucide-react";
+import { User, Phone, Fingerprint } from "lucide-react";
+import { Button } from "./ui/button";
 
 interface AccountClient {
   id: string;
@@ -21,25 +22,41 @@ export function AccountClientList({ clients }: AccountClientListProps) {
         {clients.map((client) => (
           <div
             key={client.id}
-            className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+            className="flex items-center justify-between p-4 bg-white rounded-lg shadow-sm"
           >
-            <div className="flex items-center gap-3">
-              <User className="h-5 w-5 text-gray-400" />
-              <div>
-                <p className="font-medium">{client.name}</p>
-                <p className="text-sm text-gray-500">PIN: {client.pin} | Tel: {client.phone}</p>
+            <div className="space-y-2 flex-1">
+              <div className="flex items-center gap-2">
+                <User className="h-5 w-5 text-gray-400" />
+                <span className="font-medium">{client.name}</span>
+              </div>
+              <div className="flex items-center gap-4 text-sm text-gray-600">
+                <div className="flex items-center gap-2">
+                  <Fingerprint className="h-4 w-4" />
+                  <span>PIN: {client.pin}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Phone className="h-4 w-4" />
+                  <span>Tel: {client.phone}</span>
+                </div>
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <span
-                className={`px-2 py-1 text-xs rounded-full ${
-                  client.isPaid
-                    ? "bg-green-100 text-green-700"
-                    : "bg-red-100 text-red-700"
-                }`}
+              <Button
+                variant="outline"
+                size="sm"
+                className="bg-blue-600 text-white hover:bg-blue-700"
               >
-                {client.isPaid ? "Pagado" : "Pendiente"}
-              </span>
+                Editar
+              </Button>
+              {client.isPaid ? (
+                <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
+                  Pagado
+                </span>
+              ) : (
+                <span className="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-medium">
+                  Pendiente
+                </span>
+              )}
             </div>
           </div>
         ))}

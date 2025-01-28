@@ -56,47 +56,41 @@ export function AccountList({ accounts, onEdit, onDelete }: AccountListProps) {
   };
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div className="space-y-4">
       {accounts.map((account) => (
-        <Card key={account.email} className="w-full">
-          <CardHeader className="space-y-1 p-4">
-            <div className="flex justify-between items-start">
-              <div>
-                <CardTitle className="text-xl">{account.platform}</CardTitle>
-                <CardDescription className="text-sm">{account.email}</CardDescription>
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => onEdit(account.email)}
-                >
-                  Editar
-                </Button>
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => handleDelete(account.email)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+        <Card key={account.email} className="w-full bg-gray-50">
+          <CardHeader className="p-4">
+            <div className="flex justify-between items-center">
+              <div className="flex-1">
+                <div className="flex justify-between items-center mb-2">
+                  <CardTitle className="text-xl font-bold">{account.platform}</CardTitle>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-600">{account.paidUsers}/{account.totalUsers} Pagados</span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => onEdit(account.email)}
+                      className="bg-blue-600 text-white hover:bg-blue-700"
+                    >
+                      Editar
+                    </Button>
+                  </div>
+                </div>
+                <CardDescription className="text-sm text-gray-600">{account.email}</CardDescription>
               </div>
             </div>
           </CardHeader>
           <CardContent className="p-4 pt-0">
             <div className="space-y-3">
-              <div className="space-y-2">
+              <div className="space-y-2 bg-white p-4 rounded-lg">
                 <div className="flex items-center gap-2 text-sm">
-                  <Mail className="h-4 w-4 text-gray-500" />
-                  <span className="truncate">{account.email}</span>
+                  <Mail className="h-4 w-4 text-blue-500" />
+                  <span className="text-gray-700">Email: {account.email}</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm">
-                  <Key className="h-4 w-4 text-gray-500" />
-                  <span className="truncate">{account.password}</span>
+                  <Key className="h-4 w-4 text-blue-500" />
+                  <span className="text-gray-700">Contraseña: {account.password}</span>
                 </div>
-              </div>
-              <div className="flex items-center justify-between text-sm text-gray-500 border-t pt-2">
-                <span>{account.paidUsers}/{account.totalUsers} Pagados</span>
               </div>
               <Collapsible open={openAccounts.includes(account.email)}>
                 <CollapsibleTrigger 
