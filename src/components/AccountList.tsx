@@ -56,14 +56,14 @@ export function AccountList({ accounts, onEdit, onDelete }: AccountListProps) {
   };
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       {accounts.map((account) => (
-        <Card key={account.email} className="relative">
-          <CardHeader>
+        <Card key={account.email} className="w-full">
+          <CardHeader className="space-y-1 p-4">
             <div className="flex justify-between items-start">
               <div>
-                <CardTitle>{account.platform}</CardTitle>
-                <CardDescription>{account.email}</CardDescription>
+                <CardTitle className="text-xl">{account.platform}</CardTitle>
+                <CardDescription className="text-sm">{account.email}</CardDescription>
               </div>
               <div className="flex gap-2">
                 <Button
@@ -83,19 +83,19 @@ export function AccountList({ accounts, onEdit, onDelete }: AccountListProps) {
               </div>
             </div>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
+          <CardContent className="p-4 pt-0">
+            <div className="space-y-3">
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-sm">
                   <Mail className="h-4 w-4 text-gray-500" />
-                  <span>Email: {account.email}</span>
+                  <span className="truncate">{account.email}</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm">
                   <Key className="h-4 w-4 text-gray-500" />
-                  <span>Contraseña: {account.password}</span>
+                  <span className="truncate">{account.password}</span>
                 </div>
               </div>
-              <div className="flex items-center justify-between text-sm text-gray-500">
+              <div className="flex items-center justify-between text-sm text-gray-500 border-t pt-2">
                 <span>{account.paidUsers}/{account.totalUsers} Pagados</span>
               </div>
               <Collapsible open={openAccounts.includes(account.email)}>
