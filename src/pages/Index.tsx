@@ -5,8 +5,8 @@ import { ClientList } from "@/components/ClientList";
 import { AccountList } from "@/components/AccountList";
 import { Monitor } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { NewAccountDialog } from "@/components/NewAccountDialog";
 
-// Mock data - replace with real data later
 const initialClients = [
   {
     id: "1",
@@ -67,6 +67,7 @@ const Index = () => {
   const [clients, setClients] = useState(initialClients);
   const [accounts, setAccounts] = useState(initialAccounts);
   const [activeView, setActiveView] = useState<"dashboard" | "accounts">("dashboard");
+  const [isNewAccountDialogOpen, setIsNewAccountDialogOpen] = useState(false);
   const { toast } = useToast();
 
   const stats = {
@@ -113,6 +114,18 @@ const Index = () => {
     });
   };
 
+  const handleNewAccount = (data: { platform: string; email: string; password: string }) => {
+    setAccounts([
+      ...accounts,
+      {
+        ...data,
+        paidUsers: 0,
+        totalUsers: 0,
+        clients: [],
+      },
+    ]);
+  };
+
   return (
     <div className="container mx-auto py-6">
       <header className="mb-8">
@@ -135,7 +148,12 @@ const Index = () => {
           >
             Cuentas
           </Button>
-          <Button variant="outline">+ Nueva Cuenta</Button>
+          <Button 
+            variant="outline"
+            onClick={() => setIsNewAccountDialogOpen(true)}
+          >
+            + Nueva Cuenta
+          </Button>
           {activeView === "dashboard" && (
             <Button 
               variant="outline" 
@@ -164,6 +182,12 @@ const Index = () => {
           onDelete={handleDeleteAccount}
         />
       )}
+
+      <NewAccountDialog
+        open={isNewAccountDialogOpen}
+        onOpenChange={setIsNewAccountDialogOpen}
+        onSubmit={handleNewAccount}
+      />
     </div>
   );
 };
