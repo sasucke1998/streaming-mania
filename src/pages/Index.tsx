@@ -31,6 +31,7 @@ const initialAccounts = [
     platform: "Netflix",
     email: "sasuckeking@gmail.com",
     password: "gcdegg",
+    cost: 15.99,
     paidUsers: 1,
     totalUsers: 1,
     clients: [
@@ -48,6 +49,7 @@ const initialAccounts = [
     platform: "Disney+",
     email: "nelsonmarketingdigital@gmail.com",
     password: "disney123",
+    cost: 9.99,
     paidUsers: 1,
     totalUsers: 1,
     clients: [
@@ -114,7 +116,7 @@ const Index = () => {
     });
   };
 
-  const handleNewAccount = (data: { platform: string; email: string; password: string }) => {
+  const handleNewAccount = (data: { platform: string; email: string; password: string; cost: number }) => {
     setAccounts([
       ...accounts,
       {
