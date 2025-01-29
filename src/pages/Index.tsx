@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Stats } from "@/components/Stats";
 import { ClientList } from "@/components/ClientList";
 import { AccountList } from "@/components/AccountList";
-import { Monitor, FileExcel } from "lucide-react";
+import { Monitor, FileSpreadsheet } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { NewAccountDialog } from "@/components/NewAccountDialog";
 import { EditAccountDialog } from "@/components/EditAccountDialog";
@@ -273,7 +273,7 @@ const Index = () => {
                 onClick={handleExportToExcel}
                 className="flex items-center gap-2"
               >
-                <FileExcel className="h-4 w-4" />
+                <FileSpreadsheet className="h-4 w-4" />
                 Exportar a Excel
               </Button>
             </>
