@@ -26,11 +26,8 @@ interface ClientListProps {
 
 export function ClientList({ clients, onEdit, onTogglePaid }: ClientListProps) {
   const openWhatsApp = (phone: string) => {
-    // Eliminar cualquier carácter que no sea número
     const cleanPhone = phone.replace(/\D/g, '');
-    // Crear el enlace de WhatsApp
     const whatsappUrl = `https://wa.me/${cleanPhone}`;
-    // Abrir en una nueva pestaña
     window.open(whatsappUrl, '_blank');
   };
 

@@ -3,10 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Stats } from "@/components/Stats";
 import { ClientList } from "@/components/ClientList";
 import { AccountList } from "@/components/AccountList";
-import { Monitor } from "lucide-react";
+import { Monitor, FileExcel } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { NewAccountDialog } from "@/components/NewAccountDialog";
 import { EditAccountDialog } from "@/components/EditAccountDialog";
+import * as XLSX from 'xlsx';
 
 interface Account {
   platform: string;
@@ -95,10 +96,39 @@ const Index = () => {
   const [editingAccount, setEditingAccount] = useState<Account | null>(null);
   const { toast } = useToast();
 
+  // Obtener todos los clientes de todas las cuentas
+  const allClients = accounts.flatMap(account => 
+    account.clients.map(client => ({
+      ...client,
+      platform: account.platform
+    }))
+  );
+
   const stats = {
-    activeClients: clients.length,
-    paidClients: clients.filter(client => client.isPaid).length,
-    unpaidClients: clients.filter(client => !client.isPaid).length,
+    activeClients: allClients.length,
+    paidClients: allClients.filter(client => client.isPaid).length,
+    unpaidClients: allClients.filter(client => !client.isPaid).length,
+  };
+
+  const handleExportToExcel = () => {
+    const clientsData = allClients.map(client => ({
+      Nombre: client.name,
+      Plataforma: client.platform,
+      PIN: client.pin,
+      Teléfono: client.phone,
+      Estado: client.isPaid ? 'Pagado' : 'No Pagado',
+      'Monto Pendiente': client.amountDue
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(clientsData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Clientes");
+    XLSX.writeFile(wb, "clientes.xlsx");
+
+    toast({
+      title: "Exportación exitosa",
+      description: "Los datos han sido exportados a Excel",
+    });
   };
 
   const handleEdit = (id: string) => {
@@ -230,13 +260,23 @@ const Index = () => {
             + Nueva Cuenta
           </Button>
           {activeView === "dashboard" && (
-            <Button 
-              variant="outline" 
-              onClick={handleMarkAllUnpaid}
-              className="ml-auto"
-            >
-              Marcar Todo Como No Pagado
-            </Button>
+            <>
+              <Button 
+                variant="outline" 
+                onClick={handleMarkAllUnpaid}
+                className="ml-auto"
+              >
+                Marcar Todo Como No Pagado
+              </Button>
+              <Button
+                variant="outline"
+                onClick={handleExportToExcel}
+                className="flex items-center gap-2"
+              >
+                <FileExcel className="h-4 w-4" />
+                Exportar a Excel
+              </Button>
+            </>
           )}
         </div>
       </header>
@@ -245,7 +285,7 @@ const Index = () => {
         <>
           <Stats {...stats} />
           <ClientList 
-            clients={clients}
+            clients={allClients}
             onEdit={handleEdit}
             onTogglePaid={handleTogglePaid}
           />
