@@ -16,6 +16,7 @@ interface Account {
   platform: string;
   email: string;
   password: string;
+  cost: number;
   paidUsers: number;
   totalUsers: number;
   clients: {
@@ -24,6 +25,7 @@ interface Account {
     pin: string;
     phone: string;
     isPaid: boolean;
+    amountDue: number;
   }[];
 }
 
@@ -66,6 +68,9 @@ export function AccountList({ accounts, onEdit, onDelete }: AccountListProps) {
                   <CardTitle className="text-xl font-bold">{account.platform}</CardTitle>
                   <div className="flex items-center gap-2">
                     <span className="text-sm text-gray-600">{account.paidUsers}/{account.totalUsers} Pagados</span>
+                    <span className="text-sm font-medium text-green-600">
+                      ${account.cost}/mes
+                    </span>
                     <Button
                       variant="outline"
                       size="sm"
@@ -73,6 +78,14 @@ export function AccountList({ accounts, onEdit, onDelete }: AccountListProps) {
                       className="bg-blue-600 text-white hover:bg-blue-700"
                     >
                       Editar
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleDelete(account.email)}
+                      className="bg-red-600 text-white hover:bg-red-700"
+                    >
+                      <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
                 </div>

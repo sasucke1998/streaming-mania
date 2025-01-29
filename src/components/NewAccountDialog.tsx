@@ -11,6 +11,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
+  FormMessage,
 } from "@/components/ui/form";
 import {
   Select,
@@ -22,24 +23,38 @@ import {
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
+import * as z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
-interface NewAccountFormData {
-  platform: string;
-  email: string;
-  password: string;
-}
+const formSchema = z.object({
+  platform: z.string().min(1, "Debes seleccionar una plataforma"),
+  email: z.string().email("Email inválido"),
+  password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres"),
+  cost: z.number().min(0, "El costo debe ser mayor o igual a 0"),
+});
+
+type FormData = z.infer<typeof formSchema>;
 
 interface NewAccountDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (data: NewAccountFormData) => void;
+  onSubmit: (data: FormData) => void;
 }
 
 export function NewAccountDialog({ open, onOpenChange, onSubmit }: NewAccountDialogProps) {
-  const form = useForm<NewAccountFormData>();
+  const form = useForm<FormData>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      platform: "",
+      email: "",
+      password: "",
+      cost: 0,
+    },
+  });
+
   const { toast } = useToast();
 
-  const handleSubmit = (data: NewAccountFormData) => {
+  const handleSubmit = (data: FormData) => {
     onSubmit(data);
     form.reset();
     onOpenChange(false);
@@ -76,6 +91,7 @@ export function NewAccountDialog({ open, onOpenChange, onSubmit }: NewAccountDia
                       <SelectItem value="Prime Video">Prime Video</SelectItem>
                     </SelectContent>
                   </Select>
+                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -88,6 +104,7 @@ export function NewAccountDialog({ open, onOpenChange, onSubmit }: NewAccountDia
                   <FormControl>
                     <Input placeholder="Ingresa el email" {...field} />
                   </FormControl>
+                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -100,6 +117,25 @@ export function NewAccountDialog({ open, onOpenChange, onSubmit }: NewAccountDia
                   <FormControl>
                     <Input type="password" placeholder="Ingresa la contraseña" {...field} />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="cost"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-gray-600">Costo Mensual ($)</FormLabel>
+                  <FormControl>
+                    <Input 
+                      type="number" 
+                      placeholder="0.00" 
+                      {...field}
+                      onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                    />
+                  </FormControl>
+                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -119,4 +155,5 @@ export function NewAccountDialog({ open, onOpenChange, onSubmit }: NewAccountDia
         </Form>
       </DialogContent>
     </Dialog>
-  </form>
+  );
+}
