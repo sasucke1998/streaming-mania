@@ -61,19 +61,12 @@ export function ClientList({ clients, onEdit, onTogglePaid }: ClientListProps) {
                   WhatsApp
                 </Button>
                 <Button
-                  onClick={() => onEdit(client.id)}
-                  variant="outline"
-                  size="sm"
-                >
-                  Editar
-                </Button>
-                <Button
                   onClick={() => onTogglePaid(client.id)}
                   variant={client.isPaid ? "default" : "outline"}
                   size="sm"
                   className={client.isPaid ? "bg-green-500 hover:bg-green-600" : ""}
                 >
-                  {client.isPaid ? "Pagado" : "Marcar Pagado"}
+                  {client.isPaid ? "Pagado" : "No Pagado"}
                 </Button>
               </TableCell>
             </TableRow>
