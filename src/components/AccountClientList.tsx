@@ -1,7 +1,8 @@
-import React from "react";
-import { User, Phone, Fingerprint, Trash2, DollarSign } from "lucide-react";
+import React, { useState } from "react";
+import { User, Phone, Fingerprint, Trash2, DollarSign, Plus } from "lucide-react";
 import { Button } from "./ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { EditClientDialog } from "./EditClientDialog";
 
 interface AccountClient {
   id: string;
@@ -15,10 +16,14 @@ interface AccountClient {
 interface AccountClientListProps {
   clients: AccountClient[];
   onDelete?: (id: string) => void;
+  onEdit?: (id: string, data: Omit<AccountClient, "id" | "isPaid">) => void;
+  onAdd?: (data: Omit<AccountClient, "id" | "isPaid">) => void;
 }
 
-export function AccountClientList({ clients, onDelete }: AccountClientListProps) {
+export function AccountClientList({ clients, onDelete, onEdit, onAdd }: AccountClientListProps) {
   const { toast } = useToast();
+  const [editingClient, setEditingClient] = useState<AccountClient | null>(null);
+  const [isAddingClient, setIsAddingClient] = useState(false);
 
   const handleDelete = (id: string) => {
     if (window.confirm("¿Estás seguro de que deseas eliminar este cliente?")) {
@@ -30,9 +35,44 @@ export function AccountClientList({ clients, onDelete }: AccountClientListProps)
     }
   };
 
+  const handleEdit = (client: AccountClient) => {
+    setEditingClient(client);
+  };
+
+  const handleEditSubmit = (data: Omit<AccountClient, "id" | "isPaid">) => {
+    if (editingClient) {
+      onEdit?.(editingClient.id, data);
+      setEditingClient(null);
+      toast({
+        title: "Cliente actualizado",
+        description: "Los datos del cliente han sido actualizados exitosamente",
+      });
+    }
+  };
+
+  const handleAddSubmit = (data: Omit<AccountClient, "id" | "isPaid">) => {
+    onAdd?.(data);
+    setIsAddingClient(false);
+    toast({
+      title: "Cliente agregado",
+      description: "El nuevo cliente ha sido agregado exitosamente",
+    });
+  };
+
   return (
     <div className="space-y-2 mt-4">
-      <h4 className="font-medium text-sm text-gray-500">Clientes ({clients.length}/5)</h4>
+      <div className="flex justify-between items-center">
+        <h4 className="font-medium text-sm text-gray-500">Clientes ({clients.length}/5)</h4>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setIsAddingClient(true)}
+          className="bg-green-600 text-white hover:bg-green-700"
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          Agregar Cliente
+        </Button>
+      </div>
       <div className="space-y-2">
         {clients.map((client) => (
           <div
@@ -63,6 +103,7 @@ export function AccountClientList({ clients, onDelete }: AccountClientListProps)
               <Button
                 variant="outline"
                 size="sm"
+                onClick={() => handleEdit(client)}
                 className="bg-blue-600 text-white hover:bg-blue-700"
               >
                 Editar
@@ -88,6 +129,19 @@ export function AccountClientList({ clients, onDelete }: AccountClientListProps)
           </div>
         ))}
       </div>
+
+      <EditClientDialog
+        open={editingClient !== null}
+        onOpenChange={(open) => !open && setEditingClient(null)}
+        onSubmit={handleEditSubmit}
+        client={editingClient || undefined}
+      />
+
+      <EditClientDialog
+        open={isAddingClient}
+        onOpenChange={setIsAddingClient}
+        onSubmit={handleAddSubmit}
+      />
     </div>
   );
 }

@@ -11,7 +11,6 @@ const initialClients = [
   {
     id: "1",
     name: "Kiko",
-    platform: "Netflix",
     pin: "5456",
     phone: "58860558",
     isPaid: true,
@@ -20,7 +19,6 @@ const initialClients = [
   {
     id: "2",
     name: "Juan Jose",
-    platform: "Disney+",
     pin: "5659",
     phone: "+18097532939",
     isPaid: true,
@@ -112,10 +110,47 @@ const Index = () => {
 
   const handleDeleteAccount = (email: string) => {
     setAccounts(accounts.filter(account => account.email !== email));
-    toast({
-      title: "Cuenta eliminada",
-      description: "La cuenta y sus clientes han sido eliminados exitosamente",
-    });
+  };
+
+  const handleEditClient = (email: string, clientId: string, data: any) => {
+    setAccounts(accounts.map(account => 
+      account.email === email
+        ? {
+            ...account,
+            clients: account.clients.map(client =>
+              client.id === clientId
+                ? { ...client, ...data }
+                : client
+            )
+          }
+        : account
+    ));
+  };
+
+  const handleAddClient = (email: string, data: any) => {
+    setAccounts(accounts.map(account => 
+      account.email === email
+        ? {
+            ...account,
+            clients: [...account.clients, {
+              id: Math.random().toString(36).substr(2, 9),
+              isPaid: false,
+              ...data
+            }]
+          }
+        : account
+    ));
+  };
+
+  const handleDeleteClient = (email: string, clientId: string) => {
+    setAccounts(accounts.map(account => 
+      account.email === email
+        ? {
+            ...account,
+            clients: account.clients.filter(client => client.id !== clientId)
+          }
+        : account
+    ));
   };
 
   const handleNewAccount = (data: { platform: string; email: string; password: string; cost: number }) => {
@@ -184,6 +219,9 @@ const Index = () => {
           accounts={accounts}
           onEdit={handleEditAccount}
           onDelete={handleDeleteAccount}
+          onEditClient={handleEditClient}
+          onAddClient={handleAddClient}
+          onDeleteClient={handleDeleteClient}
         />
       )}
 

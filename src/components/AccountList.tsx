@@ -33,9 +33,19 @@ interface AccountListProps {
   accounts: Account[];
   onEdit: (email: string) => void;
   onDelete: (email: string) => void;
+  onEditClient: (email: string, clientId: string, data: Omit<Account["clients"][0], "id" | "isPaid">) => void;
+  onAddClient: (email: string, data: Omit<Account["clients"][0], "id" | "isPaid">) => void;
+  onDeleteClient: (email: string, clientId: string) => void;
 }
 
-export function AccountList({ accounts, onEdit, onDelete }: AccountListProps) {
+export function AccountList({ 
+  accounts, 
+  onEdit, 
+  onDelete,
+  onEditClient,
+  onAddClient,
+  onDeleteClient
+}: AccountListProps) {
   const { toast } = useToast();
   const [openAccounts, setOpenAccounts] = useState<string[]>([]);
 
@@ -118,7 +128,12 @@ export function AccountList({ accounts, onEdit, onDelete }: AccountListProps) {
                   </Button>
                 </CollapsibleTrigger>
                 <CollapsibleContent>
-                  <AccountClientList clients={account.clients} />
+                  <AccountClientList 
+                    clients={account.clients}
+                    onDelete={(clientId) => onDeleteClient(account.email, clientId)}
+                    onEdit={(clientId, data) => onEditClient(account.email, clientId, data)}
+                    onAdd={(data) => onAddClient(account.email, data)}
+                  />
                 </CollapsibleContent>
               </Collapsible>
             </div>
