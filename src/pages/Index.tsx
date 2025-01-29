@@ -15,6 +15,7 @@ const initialClients = [
     pin: "5456",
     phone: "58860558",
     isPaid: true,
+    amountDue: 15.99,
   },
   {
     id: "2",
@@ -23,6 +24,7 @@ const initialClients = [
     pin: "5659",
     phone: "+18097532939",
     isPaid: true,
+    amountDue: 9.99,
   },
 ];
 
@@ -38,10 +40,10 @@ const initialAccounts = [
       {
         id: "1",
         name: "Kiko",
-        platform: "Netflix",
         pin: "5456",
         phone: "58860558",
         isPaid: true,
+        amountDue: 15.99,
       }
     ],
   },
@@ -56,10 +58,10 @@ const initialAccounts = [
       {
         id: "2",
         name: "Juan Jose",
-        platform: "Disney+",
         pin: "5659",
         phone: "+18097532939",
         isPaid: true,
+        amountDue: 9.99,
       }
     ],
   },
