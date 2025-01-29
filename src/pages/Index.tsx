@@ -6,6 +6,7 @@ import { AccountList } from "@/components/AccountList";
 import { Monitor } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { NewAccountDialog } from "@/components/NewAccountDialog";
+import { EditAccountDialog } from "@/components/EditAccountDialog";
 
 const initialClients = [
   {
@@ -74,6 +75,7 @@ const Index = () => {
   const [accounts, setAccounts] = useState(initialAccounts);
   const [activeView, setActiveView] = useState<"dashboard" | "accounts">("dashboard");
   const [isNewAccountDialogOpen, setIsNewAccountDialogOpen] = useState(false);
+  const [editingAccount, setEditingAccount] = useState<Account | null>(null);
   const { toast } = useToast();
 
   const stats = {
@@ -90,9 +92,22 @@ const Index = () => {
   };
 
   const handleEditAccount = (email: string) => {
+    const account = accounts.find(acc => acc.email === email);
+    if (account) {
+      setEditingAccount(account);
+    }
+  };
+
+  const handleUpdateAccount = (data: { platform: string; email: string; password: string; cost: number }) => {
+    setAccounts(accounts.map(account => 
+      account.email === editingAccount?.email
+        ? { ...account, ...data }
+        : account
+    ));
+    setEditingAccount(null);
     toast({
-      title: "Editar cuenta",
-      description: "Funcionalidad de edición de cuenta en desarrollo",
+      title: "Cuenta actualizada",
+      description: "Los cambios han sido guardados exitosamente",
     });
   };
 
@@ -234,6 +249,15 @@ const Index = () => {
         onOpenChange={setIsNewAccountDialogOpen}
         onSubmit={handleNewAccount}
       />
+
+      {editingAccount && (
+        <EditAccountDialog
+          open={!!editingAccount}
+          onOpenChange={(open) => !open && setEditingAccount(null)}
+          onSubmit={handleUpdateAccount}
+          account={editingAccount}
+        />
+      )}
     </div>
   );
 };
