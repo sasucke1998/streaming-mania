@@ -8,6 +8,23 @@ import { useToast } from "@/hooks/use-toast";
 import { NewAccountDialog } from "@/components/NewAccountDialog";
 import { EditAccountDialog } from "@/components/EditAccountDialog";
 
+interface Account {
+  platform: string;
+  email: string;
+  password: string;
+  cost: number;
+  paidUsers: number;
+  totalUsers: number;
+  clients: {
+    id: string;
+    name: string;
+    pin: string;
+    phone: string;
+    isPaid: boolean;
+    amountDue: number;
+  }[];
+}
+
 const initialClients = [
   {
     id: "1",
