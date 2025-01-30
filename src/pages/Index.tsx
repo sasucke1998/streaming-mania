@@ -1,32 +1,14 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { Stats } from "@/components/Stats";
 import { ClientList } from "@/components/ClientList";
-import { AccountList } from "@/components/AccountList";
-import { Monitor, FileSpreadsheet, Search, ChevronDown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { NewAccountDialog } from "@/components/NewAccountDialog";
 import { EditAccountDialog } from "@/components/EditAccountDialog";
 import * as XLSX from 'xlsx';
-import { Input } from "@/components/ui/input";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-
-interface Account {
-  platform: string;
-  email: string;
-  password: string;
-  cost: number;
-  paidUsers: number;
-  totalUsers: number;
-  clients: {
-    id: string;
-    name: string;
-    pin: string;
-    phone: string;
-    isPaid: boolean;
-    amountDue: number;
-  }[];
-}
+import { Header } from "@/components/Header";
+import { DashboardActions } from "@/components/DashboardActions";
+import { PlatformAccounts } from "@/components/PlatformAccounts";
+import { Account } from "@/types/account";
 
 const initialClients = [
   {
@@ -268,101 +250,39 @@ const Index = () => {
 
   return (
     <div className="container mx-auto py-6">
-      <header className="mb-8">
-        <div className="flex items-center gap-2 mb-6">
-          <Monitor className="h-8 w-8 text-blue-500" />
-          <h1 className="text-3xl font-bold text-blue-500">Sistema de Streaming</h1>
-        </div>
-        <div className="flex gap-2">
-          <Button 
-            variant={activeView === "dashboard" ? "default" : "outline"}
-            className={activeView === "dashboard" ? "bg-blue-500 hover:bg-blue-600" : ""}
-            onClick={() => setActiveView("dashboard")}
-          >
-            Dashboard
-          </Button>
-          <Button 
-            variant={activeView === "accounts" ? "default" : "outline"}
-            className={activeView === "accounts" ? "bg-blue-500 hover:bg-blue-600" : ""}
-            onClick={() => setActiveView("accounts")}
-          >
-            Cuentas
-          </Button>
-          <Button 
-            variant="outline"
-            onClick={() => setIsNewAccountDialogOpen(true)}
-          >
-            + Nueva Cuenta
-          </Button>
-          {activeView === "dashboard" && (
-            <>
-              <Button
-                variant="destructive"
-                onClick={markAllUnpaid}
-                className="ml-auto"
-              >
-                Marcar Todo Como No Pagado
-              </Button>
-              <div className="flex items-center gap-2">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                  <Input
-                    type="text"
-                    placeholder="Buscar por nombre o teléfono..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-9 w-64"
-                  />
-                </div>
-                <Button
-                  variant="outline"
-                  onClick={handleExportToExcel}
-                  className="flex items-center gap-2"
-                >
-                  <FileSpreadsheet className="h-4 w-4" />
-                  Exportar a Excel
-                </Button>
-              </div>
-            </>
-          )}
-        </div>
-      </header>
+      <Header 
+        activeView={activeView}
+        setActiveView={setActiveView}
+        onNewAccount={() => setIsNewAccountDialogOpen(true)}
+      />
 
       {activeView === "dashboard" ? (
         <>
           <Stats {...stats} />
+          <div className="flex justify-between items-center mb-4">
+            <DashboardActions 
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              onExportToExcel={handleExportToExcel}
+              onMarkAllUnpaid={markAllUnpaid}
+            />
+          </div>
           <ClientList 
             clients={filteredClients}
             onTogglePaid={handleTogglePaid}
           />
         </>
       ) : (
-        <div className="space-y-8">
-          {Object.entries(accountsByPlatform).map(([platform, platformAccounts]) => (
-            <Collapsible
-              key={platform}
-              open={openPlatforms.includes(platform)}
-              onOpenChange={() => togglePlatform(platform)}
-            >
-              <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-gray-100 rounded-lg hover:bg-gray-200">
-                <h2 className="text-xl font-bold">{platform}</h2>
-                <ChevronDown className={`h-6 w-6 transform transition-transform ${
-                  openPlatforms.includes(platform) ? 'rotate-180' : ''
-                }`} />
-              </CollapsibleTrigger>
-              <CollapsibleContent className="pt-4">
-                <AccountList 
-                  accounts={platformAccounts}
-                  onEdit={handleEditAccount}
-                  onDelete={handleDeleteAccount}
-                  onEditClient={handleEditClient}
-                  onAddClient={handleAddClient}
-                  onDeleteClient={handleDeleteClient}
-                />
-              </CollapsibleContent>
-            </Collapsible>
-          ))}
-        </div>
+        <PlatformAccounts 
+          accountsByPlatform={accountsByPlatform}
+          openPlatforms={openPlatforms}
+          onTogglePlatform={togglePlatform}
+          onEdit={handleEditAccount}
+          onDelete={handleDeleteAccount}
+          onEditClient={handleEditClient}
+          onAddClient={handleAddClient}
+          onDeleteClient={handleDeleteClient}
+        />
       )}
 
       <NewAccountDialog
