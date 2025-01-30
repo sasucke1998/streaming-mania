@@ -9,6 +9,8 @@ import { Header } from "@/components/Header";
 import { DashboardActions } from "@/components/DashboardActions";
 import { PlatformAccounts } from "@/components/PlatformAccounts";
 import { Account } from "@/types/account";
+import { ComboManagement } from "@/components/ComboManagement";
+import { PlatformCombo, ComboClient } from "@/types/combo";
 
 const initialClients = [
   {
@@ -81,6 +83,8 @@ const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [openPlatforms, setOpenPlatforms] = useState<string[]>([]);
   const { toast } = useToast();
+  const [combos, setCombos] = useState<PlatformCombo[]>([]);
+  const [comboClients, setComboClients] = useState<ComboClient[]>([]);
 
   const allClients = accounts.flatMap(account => 
     account.clients.map(client => ({
@@ -106,6 +110,7 @@ const Index = () => {
     activeClients: allClients.length,
     paidClients: allClients.filter(client => client.isPaid).length,
     unpaidClients: allClients.filter(client => !client.isPaid).length,
+    activeComboClients: comboClients.length,
   };
 
   const handleExportToExcel = () => {
@@ -248,6 +253,22 @@ const Index = () => {
     });
   };
 
+  const handleCreateCombo = (comboData: Omit<PlatformCombo, "id">) => {
+    const newCombo: PlatformCombo = {
+      id: Math.random().toString(36).substr(2, 9),
+      ...comboData,
+    };
+    setCombos([...combos, newCombo]);
+  };
+
+  const handleAddComboClient = (clientData: Omit<ComboClient, "id">) => {
+    const newClient: ComboClient = {
+      id: Math.random().toString(36).substr(2, 9),
+      ...clientData,
+    };
+    setComboClients([...comboClients, newClient]);
+  };
+
   return (
     <div className="container mx-auto py-6">
       <Header 
@@ -270,6 +291,11 @@ const Index = () => {
           <ClientList 
             clients={filteredClients}
             onTogglePaid={handleTogglePaid}
+          />
+          <ComboManagement
+            accounts={accounts}
+            onComboCreate={handleCreateCombo}
+            onComboClientAdd={handleAddComboClient}
           />
         </>
       ) : (
