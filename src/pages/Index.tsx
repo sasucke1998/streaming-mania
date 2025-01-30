@@ -3,11 +3,12 @@ import { Button } from "@/components/ui/button";
 import { Stats } from "@/components/Stats";
 import { ClientList } from "@/components/ClientList";
 import { AccountList } from "@/components/AccountList";
-import { Monitor, FileSpreadsheet } from "lucide-react";
+import { Monitor, FileSpreadsheet, Search } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { NewAccountDialog } from "@/components/NewAccountDialog";
 import { EditAccountDialog } from "@/components/EditAccountDialog";
 import * as XLSX from 'xlsx';
+import { Input } from "@/components/ui/input";
 
 interface Account {
   platform: string;
@@ -94,6 +95,7 @@ const Index = () => {
   const [activeView, setActiveView] = useState<"dashboard" | "accounts">("dashboard");
   const [isNewAccountDialogOpen, setIsNewAccountDialogOpen] = useState(false);
   const [editingAccount, setEditingAccount] = useState<Account | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
   const { toast } = useToast();
 
   // Obtener todos los clientes de todas las cuentas
@@ -103,6 +105,21 @@ const Index = () => {
       platform: account.platform
     }))
   );
+
+  // Filtrar clientes basado en la búsqueda
+  const filteredClients = allClients.filter(client => 
+    client.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    client.phone.includes(searchQuery)
+  );
+
+  // Agrupar cuentas por plataforma
+  const accountsByPlatform = accounts.reduce((acc, account) => {
+    if (!acc[account.platform]) {
+      acc[account.platform] = [];
+    }
+    acc[account.platform].push(account);
+    return acc;
+  }, {} as Record<string, Account[]>);
 
   const stats = {
     activeClients: allClients.length,
@@ -131,10 +148,21 @@ const Index = () => {
     });
   };
 
-  const handleEdit = (id: string) => {
+  const handleTogglePaid = (clientId: string) => {
+    setAccounts(prevAccounts => 
+      prevAccounts.map(account => ({
+        ...account,
+        clients: account.clients.map(client => 
+          client.id === clientId
+            ? { ...client, isPaid: !client.isPaid }
+            : client
+        )
+      }))
+    );
+
     toast({
-      title: "Editar cliente",
-      description: "Funcionalidad de edición en desarrollo",
+      title: "Estado actualizado",
+      description: "El estado de pago del cliente ha sido actualizado",
     });
   };
 
@@ -155,22 +183,6 @@ const Index = () => {
     toast({
       title: "Cuenta actualizada",
       description: "Los cambios han sido guardados exitosamente",
-    });
-  };
-
-  const handleTogglePaid = (id: string) => {
-    setClients(clients.map(client => 
-      client.id === id 
-        ? { ...client, isPaid: !client.isPaid }
-        : client
-    ));
-  };
-
-  const handleMarkAllUnpaid = () => {
-    setClients(clients.map(client => ({ ...client, isPaid: false })));
-    toast({
-      title: "Actualizado",
-      description: "Todos los clientes han sido marcados como no pagados",
     });
   };
 
@@ -261,21 +273,26 @@ const Index = () => {
           </Button>
           {activeView === "dashboard" && (
             <>
-              <Button 
-                variant="outline" 
-                onClick={handleMarkAllUnpaid}
-                className="ml-auto"
-              >
-                Marcar Todo Como No Pagado
-              </Button>
-              <Button
-                variant="outline"
-                onClick={handleExportToExcel}
-                className="flex items-center gap-2"
-              >
-                <FileSpreadsheet className="h-4 w-4" />
-                Exportar a Excel
-              </Button>
+              <div className="ml-auto flex items-center gap-2">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <Input
+                    type="text"
+                    placeholder="Buscar por nombre o teléfono..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-9 w-64"
+                  />
+                </div>
+                <Button
+                  variant="outline"
+                  onClick={handleExportToExcel}
+                  className="flex items-center gap-2"
+                >
+                  <FileSpreadsheet className="h-4 w-4" />
+                  Exportar a Excel
+                </Button>
+              </div>
             </>
           )}
         </div>
@@ -285,20 +302,26 @@ const Index = () => {
         <>
           <Stats {...stats} />
           <ClientList 
-            clients={allClients}
-            onEdit={handleEdit}
+            clients={filteredClients}
             onTogglePaid={handleTogglePaid}
           />
         </>
       ) : (
-        <AccountList 
-          accounts={accounts}
-          onEdit={handleEditAccount}
-          onDelete={handleDeleteAccount}
-          onEditClient={handleEditClient}
-          onAddClient={handleAddClient}
-          onDeleteClient={handleDeleteClient}
-        />
+        <div className="space-y-8">
+          {Object.entries(accountsByPlatform).map(([platform, platformAccounts]) => (
+            <div key={platform}>
+              <h2 className="text-xl font-bold mb-4">{platform}</h2>
+              <AccountList 
+                accounts={platformAccounts}
+                onEdit={handleEditAccount}
+                onDelete={handleDeleteAccount}
+                onEditClient={handleEditClient}
+                onAddClient={handleAddClient}
+                onDeleteClient={handleDeleteClient}
+              />
+            </div>
+          ))}
+        </div>
       )}
 
       <NewAccountDialog

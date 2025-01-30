@@ -20,11 +20,10 @@ interface Client {
 
 interface ClientListProps {
   clients: Client[];
-  onEdit: (id: string) => void;
   onTogglePaid: (id: string) => void;
 }
 
-export function ClientList({ clients, onEdit, onTogglePaid }: ClientListProps) {
+export function ClientList({ clients, onTogglePaid }: ClientListProps) {
   const openWhatsApp = (phone: string) => {
     const cleanPhone = phone.replace(/\D/g, '');
     const whatsappUrl = `https://wa.me/${cleanPhone}`;
