@@ -3,12 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Stats } from "@/components/Stats";
 import { ClientList } from "@/components/ClientList";
 import { AccountList } from "@/components/AccountList";
-import { Monitor, FileSpreadsheet, Search } from "lucide-react";
+import { Monitor, FileSpreadsheet, Search, ChevronDown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { NewAccountDialog } from "@/components/NewAccountDialog";
 import { EditAccountDialog } from "@/components/EditAccountDialog";
 import * as XLSX from 'xlsx';
 import { Input } from "@/components/ui/input";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 interface Account {
   platform: string;
@@ -96,9 +97,9 @@ const Index = () => {
   const [isNewAccountDialogOpen, setIsNewAccountDialogOpen] = useState(false);
   const [editingAccount, setEditingAccount] = useState<Account | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [openPlatforms, setOpenPlatforms] = useState<string[]>([]);
   const { toast } = useToast();
 
-  // Obtener todos los clientes de todas las cuentas
   const allClients = accounts.flatMap(account => 
     account.clients.map(client => ({
       ...client,
@@ -106,13 +107,11 @@ const Index = () => {
     }))
   );
 
-  // Filtrar clientes basado en la búsqueda
   const filteredClients = allClients.filter(client => 
     client.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     client.phone.includes(searchQuery)
   );
 
-  // Agrupar cuentas por plataforma
   const accountsByPlatform = accounts.reduce((acc, account) => {
     if (!acc[account.platform]) {
       acc[account.platform] = [];
@@ -243,6 +242,30 @@ const Index = () => {
     ]);
   };
 
+  const togglePlatform = (platform: string) => {
+    setOpenPlatforms(prev => 
+      prev.includes(platform) 
+        ? prev.filter(p => p !== platform)
+        : [...prev, platform]
+    );
+  };
+
+  const markAllUnpaid = () => {
+    setAccounts(prevAccounts => 
+      prevAccounts.map(account => ({
+        ...account,
+        clients: account.clients.map(client => ({
+          ...client,
+          isPaid: false
+        }))
+      }))
+    );
+    toast({
+      title: "Actualización masiva",
+      description: "Todas las cuentas han sido marcadas como no pagadas",
+    });
+  };
+
   return (
     <div className="container mx-auto py-6">
       <header className="mb-8">
@@ -273,7 +296,14 @@ const Index = () => {
           </Button>
           {activeView === "dashboard" && (
             <>
-              <div className="ml-auto flex items-center gap-2">
+              <Button
+                variant="destructive"
+                onClick={markAllUnpaid}
+                className="ml-auto"
+              >
+                Marcar Todo Como No Pagado
+              </Button>
+              <div className="flex items-center gap-2">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                   <Input
@@ -309,17 +339,28 @@ const Index = () => {
       ) : (
         <div className="space-y-8">
           {Object.entries(accountsByPlatform).map(([platform, platformAccounts]) => (
-            <div key={platform}>
-              <h2 className="text-xl font-bold mb-4">{platform}</h2>
-              <AccountList 
-                accounts={platformAccounts}
-                onEdit={handleEditAccount}
-                onDelete={handleDeleteAccount}
-                onEditClient={handleEditClient}
-                onAddClient={handleAddClient}
-                onDeleteClient={handleDeleteClient}
-              />
-            </div>
+            <Collapsible
+              key={platform}
+              open={openPlatforms.includes(platform)}
+              onOpenChange={() => togglePlatform(platform)}
+            >
+              <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-gray-100 rounded-lg hover:bg-gray-200">
+                <h2 className="text-xl font-bold">{platform}</h2>
+                <ChevronDown className={`h-6 w-6 transform transition-transform ${
+                  openPlatforms.includes(platform) ? 'rotate-180' : ''
+                }`} />
+              </CollapsibleTrigger>
+              <CollapsibleContent className="pt-4">
+                <AccountList 
+                  accounts={platformAccounts}
+                  onEdit={handleEditAccount}
+                  onDelete={handleDeleteAccount}
+                  onEditClient={handleEditClient}
+                  onAddClient={handleAddClient}
+                  onDeleteClient={handleDeleteClient}
+                />
+              </CollapsibleContent>
+            </Collapsible>
           ))}
         </div>
       )}
