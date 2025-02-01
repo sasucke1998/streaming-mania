@@ -129,7 +129,7 @@ export function ComboManagementList({
                     </div>
                     <div className="flex justify-between">
                       <span className="text-sm font-medium">Estado:</span>
-                      <Badge variant={client.isPaid ? "success" : "destructive"}>
+                      <Badge variant={client.isPaid ? "secondary" : "destructive"}>
                         {client.isPaid ? "Pagado" : "Pendiente"}
                       </Badge>
                     </div>
