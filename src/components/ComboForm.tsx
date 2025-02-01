@@ -32,24 +32,32 @@ export function ComboForm({ availablePlatforms, onSubmit }: ComboFormProps) {
         return newPins;
       });
     } else {
-      setSelectedPlatforms(prev => [...prev, platform]);
-      setPins(prev => ({
-        ...prev,
-        [platform]: Math.floor(1000 + Math.random() * 9000).toString()
-      }));
+      if (getAvailableSpots(platform) > 0) {
+        setSelectedPlatforms(prev => [...prev, platform]);
+        setPins(prev => ({
+          ...prev,
+          [platform]: Math.floor(1000 + Math.random() * 9000).toString()
+        }));
+      } else {
+        toast({
+          title: "Error",
+          description: "Esta plataforma no tiene espacios disponibles",
+          variant: "destructive",
+        });
+      }
     }
   };
 
   const getAvailableSpots = (platform: string) => {
     const account = availablePlatforms.find(acc => acc.platform === platform);
     if (!account) return 0;
-    return Math.max(0, account.totalUsers - account.paidUsers);
+    return Math.max(0, 5 - account.paidUsers); // Máximo 5 usuarios por plataforma
   };
 
   const calculateTotalCost = () => {
     return availablePlatforms
       .filter(acc => selectedPlatforms.includes(acc.platform))
-      .reduce((total, acc) => total + acc.cost, 0) * 0.9; // 10% discount
+      .reduce((total, acc) => total + acc.cost, 0) * 0.9; // 10% de descuento
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -64,6 +72,17 @@ export function ComboForm({ availablePlatforms, onSubmit }: ComboFormProps) {
       return;
     }
 
+    // Verificar que todos los PINs estén establecidos
+    const allPinsSet = selectedPlatforms.every(platform => pins[platform]?.length === 4);
+    if (!allPinsSet) {
+      toast({
+        title: "Error",
+        description: "Todos los PINs deben tener 4 dígitos",
+        variant: "destructive",
+      });
+      return;
+    }
+
     onSubmit({
       clientName,
       clientPhone,
@@ -71,7 +90,7 @@ export function ComboForm({ availablePlatforms, onSubmit }: ComboFormProps) {
       pins,
     });
 
-    // Reset form
+    // Limpiar el formulario
     setClientName("");
     setClientPhone("");
     setSelectedPlatforms([]);
@@ -147,12 +166,17 @@ export function ComboForm({ availablePlatforms, onSubmit }: ComboFormProps) {
                 <Input
                   id={`pin-${platform}`}
                   value={pins[platform] || ""}
-                  onChange={(e) => setPins(prev => ({
-                    ...prev,
-                    [platform]: e.target.value
-                  }))}
-                  placeholder="PIN"
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, '').slice(0, 4);
+                    setPins(prev => ({
+                      ...prev,
+                      [platform]: value
+                    }));
+                  }}
+                  placeholder="PIN (4 dígitos)"
                   required
+                  maxLength={4}
+                  pattern="\d{4}"
                 />
               </div>
             ))}
