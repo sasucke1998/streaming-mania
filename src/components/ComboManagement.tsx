@@ -9,6 +9,7 @@ import {
 import { PlatformCombo, ComboClient, ComboFormData } from "@/types/combo";
 import { useToast } from "@/hooks/use-toast";
 import { ComboForm } from "./ComboForm";
+import { ComboManagementList } from "./ComboManagementList";
 
 interface ComboManagementProps {
   accounts: {
@@ -17,17 +18,33 @@ interface ComboManagementProps {
     totalUsers: number;
     paidUsers: number;
   }[];
+  combos: PlatformCombo[];
+  comboClients: ComboClient[];
   onComboCreate: (combo: Omit<PlatformCombo, "id">) => void;
   onComboClientAdd: (client: Omit<ComboClient, "id" | "comboId">) => void;
+  onComboUpdate: (comboId: string, updatedData: Partial<PlatformCombo>) => void;
+  onClientUpdate: (clientId: string, updatedData: Partial<ComboClient>) => void;
+  onComboDelete: (comboId: string) => void;
 }
 
-export function ComboManagement({ accounts, onComboCreate, onComboClientAdd }: ComboManagementProps) {
+export function ComboManagement({ 
+  accounts, 
+  combos,
+  comboClients,
+  onComboCreate, 
+  onComboClientAdd,
+  onComboUpdate,
+  onClientUpdate,
+  onComboDelete
+}: ComboManagementProps) {
   const { toast } = useToast();
 
   const handleComboSubmit = (formData: ComboFormData) => {
-    const comboPrice = accounts
-      .filter(account => formData.selectedPlatforms.includes(account.platform))
-      .reduce((total, account) => total + account.cost, 0) * 0.9; // 10% discount
+    const comboPrice = formData.selectedPlatforms.reduce((total, platform) => {
+      const account = accounts.find(acc => acc.platform === platform);
+      if (!account) return total;
+      return total + (account.cost * 0.9); // 10% de descuento por plataforma
+    }, 0);
 
     const comboName = `Combo ${formData.selectedPlatforms.join(" + ")}`;
 
@@ -51,19 +68,29 @@ export function ComboManagement({ accounts, onComboCreate, onComboClientAdd }: C
   };
 
   return (
-    <Card className="mt-6">
-      <CardHeader>
-        <CardTitle>Crear Combo de Plataformas</CardTitle>
-        <CardDescription>
-          Registra un nuevo cliente con múltiples plataformas y obtén un 10% de descuento
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <ComboForm 
-          availablePlatforms={accounts}
-          onSubmit={handleComboSubmit}
-        />
-      </CardContent>
-    </Card>
+    <div className="space-y-8">
+      <Card>
+        <CardHeader>
+          <CardTitle>Crear Combo de Plataformas</CardTitle>
+          <CardDescription>
+            Registra un nuevo cliente con múltiples plataformas y obtén un 10% de descuento por plataforma
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ComboForm 
+            availablePlatforms={accounts}
+            onSubmit={handleComboSubmit}
+          />
+        </CardContent>
+      </Card>
+
+      <ComboManagementList
+        combos={combos}
+        comboClients={comboClients}
+        onUpdateCombo={onComboUpdate}
+        onUpdateClient={onClientUpdate}
+        onDeleteCombo={onComboDelete}
+      />
+    </div>
   );
 }

@@ -51,13 +51,16 @@ export function ComboForm({ availablePlatforms, onSubmit }: ComboFormProps) {
   const getAvailableSpots = (platform: string) => {
     const account = availablePlatforms.find(acc => acc.platform === platform);
     if (!account) return 0;
-    return Math.max(0, 5 - account.paidUsers); // Máximo 5 usuarios por plataforma
+    return Math.max(0, 5 - account.paidUsers);
   };
 
   const calculateTotalCost = () => {
-    return availablePlatforms
-      .filter(acc => selectedPlatforms.includes(acc.platform))
-      .reduce((total, acc) => total + acc.cost, 0) * 0.9; // 10% de descuento
+    return selectedPlatforms.reduce((total, platform) => {
+      const account = availablePlatforms.find(acc => acc.platform === platform);
+      if (!account) return total;
+      // Aplicar descuento del 10% por plataforma
+      return total + (account.cost * 0.9);
+    }, 0);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -72,7 +75,6 @@ export function ComboForm({ availablePlatforms, onSubmit }: ComboFormProps) {
       return;
     }
 
-    // Verificar que todos los PINs estén establecidos
     const allPinsSet = selectedPlatforms.every(platform => pins[platform]?.length === 4);
     if (!allPinsSet) {
       toast({
@@ -90,7 +92,6 @@ export function ComboForm({ availablePlatforms, onSubmit }: ComboFormProps) {
       pins,
     });
 
-    // Limpiar el formulario
     setClientName("");
     setClientPhone("");
     setSelectedPlatforms([]);
@@ -188,7 +189,7 @@ export function ComboForm({ availablePlatforms, onSubmit }: ComboFormProps) {
               <span className="font-medium">${(calculateTotalCost() / 0.9).toFixed(2)}</span>
             </div>
             <div className="flex justify-between items-center text-green-600 font-bold">
-              <span>Precio con descuento (10%):</span>
+              <span>Precio con descuento (10% por plataforma):</span>
               <span>${calculateTotalCost().toFixed(2)}</span>
             </div>
           </div>
