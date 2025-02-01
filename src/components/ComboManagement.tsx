@@ -9,11 +9,14 @@ import {
 } from "@/components/ui/card";
 import { PlatformCombo, ComboClient } from "@/types/combo";
 import { useToast } from "@/hooks/use-toast";
+import { Badge } from "@/components/ui/badge";
 
 interface ComboManagementProps {
   accounts: {
     platform: string;
     cost: number;
+    totalUsers: number;
+    paidUsers: number;
   }[];
   onComboCreate: (combo: Omit<PlatformCombo, "id">) => void;
   onComboClientAdd: (client: Omit<ComboClient, "id">) => void;
@@ -35,6 +38,12 @@ export function ComboManagement({ accounts, onComboCreate, onComboClientAdd }: C
     return accounts
       .filter(account => selectedPlatforms.includes(account.platform))
       .reduce((total, account) => total + account.cost, 0);
+  };
+
+  const getAvailableSpots = (platform: string) => {
+    const account = accounts.find(acc => acc.platform === platform);
+    if (!account) return 0;
+    return Math.max(0, account.totalUsers - account.paidUsers);
   };
 
   const handleCreateCombo = () => {
@@ -74,16 +83,27 @@ export function ComboManagement({ accounts, onComboCreate, onComboClientAdd }: C
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
-          {accounts.map((account) => (
-            <Button
-              key={account.platform}
-              variant={selectedPlatforms.includes(account.platform) ? "default" : "outline"}
-              onClick={() => handlePlatformToggle(account.platform)}
-              className="w-full"
-            >
-              {account.platform}
-            </Button>
-          ))}
+          {accounts.map((account) => {
+            const availableSpots = getAvailableSpots(account.platform);
+            return (
+              <div key={account.platform} className="relative">
+                <Button
+                  variant={selectedPlatforms.includes(account.platform) ? "default" : "outline"}
+                  onClick={() => handlePlatformToggle(account.platform)}
+                  className="w-full"
+                  disabled={availableSpots === 0}
+                >
+                  {account.platform}
+                </Button>
+                <Badge 
+                  variant={availableSpots > 0 ? "default" : "destructive"}
+                  className="absolute -top-2 -right-2"
+                >
+                  {availableSpots} disponible{availableSpots !== 1 ? 's' : ''}
+                </Badge>
+              </div>
+            );
+          })}
         </div>
         {selectedPlatforms.length > 0 && (
           <div className="space-y-4">

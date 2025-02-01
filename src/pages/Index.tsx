@@ -206,15 +206,18 @@ const Index = () => {
     ));
   };
 
-  const handleDeleteClient = (email: string, clientId: string) => {
-    setAccounts(accounts.map(account => 
-      account.email === email
-        ? {
-            ...account,
-            clients: account.clients.filter(client => client.id !== clientId)
-          }
-        : account
-    ));
+  const handleDeleteClient = (clientId: string) => {
+    setAccounts(prevAccounts => 
+      prevAccounts.map(account => ({
+        ...account,
+        clients: account.clients.filter(client => client.id !== clientId)
+      }))
+    );
+    
+    toast({
+      title: "Cliente eliminado",
+      description: "El cliente ha sido eliminado exitosamente",
+    });
   };
 
   const handleNewAccount = (data: { platform: string; email: string; password: string; cost: number }) => {
@@ -280,17 +283,16 @@ const Index = () => {
       {activeView === "dashboard" ? (
         <>
           <Stats {...stats} />
-          <div className="flex justify-between items-center mb-4">
-            <DashboardActions 
-              searchQuery={searchQuery}
-              onSearchChange={setSearchQuery}
-              onExportToExcel={handleExportToExcel}
-              onMarkAllUnpaid={markAllUnpaid}
-            />
-          </div>
+          <DashboardActions 
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            onExportToExcel={handleExportToExcel}
+            onMarkAllUnpaid={markAllUnpaid}
+          />
           <ClientList 
             clients={filteredClients}
             onTogglePaid={handleTogglePaid}
+            onDeleteClient={handleDeleteClient}
           />
           <ComboManagement
             accounts={accounts}
