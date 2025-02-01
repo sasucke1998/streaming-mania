@@ -24,13 +24,15 @@ export function ComboForm({ availablePlatforms, onSubmit }: ComboFormProps) {
   const { toast } = useToast();
 
   const handlePlatformToggle = (platform: string) => {
-    setSelectedPlatforms(prev =>
-      prev.includes(platform)
-        ? prev.filter(p => p !== platform)
-        : [...prev, platform]
-    );
-
-    if (!pins[platform]) {
+    if (selectedPlatforms.includes(platform)) {
+      setSelectedPlatforms(prev => prev.filter(p => p !== platform));
+      setPins(prev => {
+        const newPins = { ...prev };
+        delete newPins[platform];
+        return newPins;
+      });
+    } else {
+      setSelectedPlatforms(prev => [...prev, platform]);
       setPins(prev => ({
         ...prev,
         [platform]: Math.floor(1000 + Math.random() * 9000).toString()
@@ -74,53 +76,61 @@ export function ComboForm({ availablePlatforms, onSubmit }: ComboFormProps) {
     setClientPhone("");
     setSelectedPlatforms([]);
     setPins({});
+
+    toast({
+      title: "¡Éxito!",
+      description: "El combo ha sido creado correctamente",
+    });
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-4">
         <div>
-          <Label htmlFor="clientName">Nombre del Cliente</Label>
+          <Label htmlFor="clientName">Nombre del Cliente *</Label>
           <Input
             id="clientName"
             value={clientName}
             onChange={(e) => setClientName(e.target.value)}
             placeholder="Nombre completo"
+            required
           />
         </div>
         <div>
-          <Label htmlFor="clientPhone">Teléfono</Label>
+          <Label htmlFor="clientPhone">Teléfono *</Label>
           <Input
             id="clientPhone"
             value={clientPhone}
             onChange={(e) => setClientPhone(e.target.value)}
             placeholder="Número de teléfono"
+            required
           />
         </div>
       </div>
 
       <div className="space-y-4">
-        <Label>Plataformas Disponibles</Label>
+        <Label>Plataformas Disponibles *</Label>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           {availablePlatforms.map((account) => {
             const availableSpots = getAvailableSpots(account.platform);
+            const isSelected = selectedPlatforms.includes(account.platform);
             return (
               <div key={account.platform} className="relative">
                 <Button
                   type="button"
-                  variant={selectedPlatforms.includes(account.platform) ? "default" : "outline"}
+                  variant={isSelected ? "default" : "outline"}
                   onClick={() => handlePlatformToggle(account.platform)}
-                  className="w-full"
-                  disabled={availableSpots === 0}
+                  className={`w-full ${isSelected ? 'ring-2 ring-offset-2 ring-primary' : ''}`}
+                  disabled={availableSpots === 0 && !isSelected}
                 >
                   {account.platform}
+                  <Badge 
+                    variant={availableSpots > 0 ? "default" : "destructive"}
+                    className="absolute -top-2 -right-2"
+                  >
+                    {availableSpots} disponible{availableSpots !== 1 ? 's' : ''}
+                  </Badge>
                 </Button>
-                <Badge 
-                  variant={availableSpots > 0 ? "default" : "destructive"}
-                  className="absolute -top-2 -right-2"
-                >
-                  {availableSpots} disponible{availableSpots !== 1 ? 's' : ''}
-                </Badge>
               </div>
             );
           })}
@@ -142,6 +152,7 @@ export function ComboForm({ availablePlatforms, onSubmit }: ComboFormProps) {
                     [platform]: e.target.value
                   }))}
                   placeholder="PIN"
+                  required
                 />
               </div>
             ))}
@@ -150,10 +161,10 @@ export function ComboForm({ availablePlatforms, onSubmit }: ComboFormProps) {
           <div className="pt-4 border-t">
             <div className="flex justify-between items-center">
               <span>Precio regular:</span>
-              <span>${(calculateTotalCost() / 0.9).toFixed(2)}</span>
+              <span className="font-medium">${(calculateTotalCost() / 0.9).toFixed(2)}</span>
             </div>
             <div className="flex justify-between items-center text-green-600 font-bold">
-              <span>Precio con descuento:</span>
+              <span>Precio con descuento (10%):</span>
               <span>${calculateTotalCost().toFixed(2)}</span>
             </div>
           </div>
@@ -165,7 +176,7 @@ export function ComboForm({ availablePlatforms, onSubmit }: ComboFormProps) {
         className="w-full bg-green-600 hover:bg-green-700"
         disabled={selectedPlatforms.length === 0}
       >
-        Crear Combo
+        Crear Combo ({selectedPlatforms.length} plataforma{selectedPlatforms.length !== 1 ? 's' : ''})
       </Button>
     </form>
   );
