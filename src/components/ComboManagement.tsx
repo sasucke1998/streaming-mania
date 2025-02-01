@@ -20,8 +20,8 @@ interface ComboManagementProps {
   }[];
   combos: PlatformCombo[];
   comboClients: ComboClient[];
-  onComboCreate: (combo: Omit<PlatformCombo, "id">) => void;
-  onComboClientAdd: (client: Omit<ComboClient, "id" | "comboId">) => void;
+  onComboCreate: (combo: Omit<PlatformCombo, "id">) => string;
+  onComboClientAdd: (client: Omit<ComboClient, "id" | "comboId">, comboId: string) => void;
   onComboUpdate: (comboId: string, updatedData: Partial<PlatformCombo>) => void;
   onClientUpdate: (clientId: string, updatedData: Partial<ComboClient>) => void;
   onComboDelete: (comboId: string) => void;
@@ -43,12 +43,12 @@ export function ComboManagement({
     const comboPrice = formData.selectedPlatforms.reduce((total, platform) => {
       const account = accounts.find(acc => acc.platform === platform);
       if (!account) return total;
-      return total + (account.cost * 0.9); // 10% de descuento por plataforma
+      return total + (account.cost * 0.9); // 10% discount per platform
     }, 0);
 
     const comboName = `Combo ${formData.selectedPlatforms.join(" + ")}`;
 
-    onComboCreate({
+    const newComboId = onComboCreate({
       name: comboName,
       platforms: formData.selectedPlatforms,
       cost: comboPrice,
@@ -59,11 +59,11 @@ export function ComboManagement({
       phone: formData.clientPhone,
       pins: formData.pins,
       isPaid: false,
-    });
+    }, newComboId);
 
     toast({
-      title: "Combo creado",
-      description: "El combo y el cliente han sido registrados exitosamente",
+      title: "Combo created",
+      description: "The combo and client have been successfully registered",
     });
   };
 
@@ -71,9 +71,9 @@ export function ComboManagement({
     <div className="space-y-8">
       <Card>
         <CardHeader>
-          <CardTitle>Crear Combo de Plataformas</CardTitle>
+          <CardTitle>Create Platform Combo</CardTitle>
           <CardDescription>
-            Registra un nuevo cliente con múltiples plataformas y obtén un 10% de descuento por plataforma
+            Register a new client with multiple platforms and get a 10% discount per platform
           </CardDescription>
         </CardHeader>
         <CardContent>

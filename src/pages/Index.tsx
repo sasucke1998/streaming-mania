@@ -257,20 +257,22 @@ const Index = () => {
   };
 
   const handleCreateCombo = (comboData: Omit<PlatformCombo, "id">) => {
+    const newComboId = Math.random().toString(36).substr(2, 9);
     const newCombo: PlatformCombo = {
-      id: Math.random().toString(36).substr(2, 9),
+      id: newComboId,
       ...comboData,
     };
-    setCombos([...combos, newCombo]);
+    setCombos(prevCombos => [...prevCombos, newCombo]);
+    return newComboId; // Return the ID for immediate use
   };
 
-  const handleAddComboClient = (clientData: Omit<ComboClient, "id">) => {
+  const handleAddComboClient = (clientData: Omit<ComboClient, "id">, comboId: string) => {
     const newClient: ComboClient = {
       id: Math.random().toString(36).substr(2, 9),
-      comboId: combos[combos.length - 1].id,
+      comboId: comboId,
       ...clientData,
     };
-    setComboClients([...comboClients, newClient]);
+    setComboClients(prevClients => [...prevClients, newClient]);
   };
 
   const handleUpdateCombo = (comboId: string, updatedData: Partial<PlatformCombo>) => {
