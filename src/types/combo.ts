@@ -8,6 +8,15 @@ export interface PlatformCombo {
 export interface ComboClient {
   id: string;
   name: string;
+  phone: string;
+  pins: Record<string, string>; // platform -> pin
   comboId: string;
   isPaid: boolean;
+}
+
+export interface ComboFormData {
+  clientName: string;
+  clientPhone: string;
+  selectedPlatforms: string[];
+  pins: Record<string, string>;
 }
