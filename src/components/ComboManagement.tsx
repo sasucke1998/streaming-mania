@@ -40,13 +40,15 @@ export function ComboManagement({
   const { toast } = useToast();
 
   const handleComboSubmit = (formData: ComboFormData) => {
-    // Calculate price per platform based on individual client cost
+    // Calculate total price based on the cost per client for each platform
     const comboPrice = formData.selectedPlatforms.reduce((total, platform) => {
       const account = accounts.find(acc => acc.platform === platform);
       if (!account) return total;
-      // Calculate individual client cost and apply 10% discount
-      const clientCost = account.cost / account.totalUsers;
-      return total + (clientCost * 0.9);
+      
+      // Get the cost per client from the account's cost divided by total users
+      const costPerClient = account.cost / account.totalUsers;
+      // Apply 10% discount to the client's portion
+      return total + (costPerClient * 0.9);
     }, 0);
 
     const comboName = `Combo ${formData.selectedPlatforms.join(" + ")}`;
@@ -92,7 +94,7 @@ export function ComboManagement({
         comboClients={comboClients}
         onUpdateCombo={onComboUpdate}
         onUpdateClient={onClientUpdate}
-        onDeleteCombo={onComboDelete}
+        onDeleteCombo={onDeleteCombo}
       />
     </div>
   );
