@@ -6,6 +6,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { PlatformCombo, ComboClient, ComboFormData } from "@/types/combo";
 import { useToast } from "@/hooks/use-toast";
 import { ComboForm } from "./ComboForm";
@@ -38,6 +40,7 @@ export function ComboManagement({
   onComboDelete
 }: ComboManagementProps) {
   const { toast } = useToast();
+  const [isComboSectionOpen, setIsComboSectionOpen] = useState(false);
 
   const handleComboSubmit = (formData: ComboFormData) => {
     // Apply 10% discount to the manually entered price
@@ -65,29 +68,41 @@ export function ComboManagement({
   };
 
   return (
-    <div className="space-y-8">
-      <Card>
-        <CardHeader>
-          <CardTitle>Create Platform Combo</CardTitle>
-          <CardDescription>
-            Register a new client with multiple platforms and get a 10% discount
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ComboForm 
-            availablePlatforms={accounts}
-            onSubmit={handleComboSubmit}
-          />
-        </CardContent>
-      </Card>
+    <div className="space-y-4">
+      <Button
+        onClick={() => setIsComboSectionOpen(!isComboSectionOpen)}
+        className="w-full flex items-center justify-between bg-blue-500 hover:bg-blue-600 text-white py-3"
+      >
+        <span>Gestión de Combos de Plataformas</span>
+        {isComboSectionOpen ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
+      </Button>
 
-      <ComboManagementList
-        combos={combos}
-        comboClients={comboClients}
-        onUpdateCombo={onComboUpdate}
-        onUpdateClient={onClientUpdate}
-        onDeleteCombo={onComboDelete}
-      />
+      {isComboSectionOpen && (
+        <div className="space-y-8 mt-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Create Platform Combo</CardTitle>
+              <CardDescription>
+                Register a new client with multiple platforms and get a 10% discount
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ComboForm 
+                availablePlatforms={accounts}
+                onSubmit={handleComboSubmit}
+              />
+            </CardContent>
+          </Card>
+
+          <ComboManagementList
+            combos={combos}
+            comboClients={comboClients}
+            onUpdateCombo={onComboUpdate}
+            onUpdateClient={onClientUpdate}
+            onDeleteCombo={onComboDelete}
+          />
+        </div>
+      )}
     </div>
   );
 }
