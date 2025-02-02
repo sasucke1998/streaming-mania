@@ -19,4 +19,5 @@ export interface ComboFormData {
   clientPhone: string;
   selectedPlatforms: string[];
   pins: Record<string, string>;
+  manualPrice: number;
 }

@@ -40,17 +40,8 @@ export function ComboManagement({
   const { toast } = useToast();
 
   const handleComboSubmit = (formData: ComboFormData) => {
-    // Calculate total price based on the individual platform costs
-    const comboPrice = formData.selectedPlatforms.reduce((total, platform) => {
-      const account = accounts.find(acc => acc.platform === platform);
-      if (!account) return total;
-      
-      // Apply 10% discount to each platform's cost individually
-      const platformCost = account.cost;
-      const discountedCost = platformCost * 0.9;
-      
-      return total + discountedCost;
-    }, 0);
+    // Apply 10% discount to the manually entered price
+    const comboPrice = formData.manualPrice * 0.9;
 
     const comboName = `Combo ${formData.selectedPlatforms.join(" + ")}`;
 
@@ -79,7 +70,7 @@ export function ComboManagement({
         <CardHeader>
           <CardTitle>Create Platform Combo</CardTitle>
           <CardDescription>
-            Register a new client with multiple platforms and get a 10% discount per platform
+            Register a new client with multiple platforms and get a 10% discount
           </CardDescription>
         </CardHeader>
         <CardContent>

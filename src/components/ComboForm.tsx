@@ -21,6 +21,7 @@ export function ComboForm({ availablePlatforms, onSubmit }: ComboFormProps) {
   const [clientPhone, setClientPhone] = useState("");
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
   const [pins, setPins] = useState<Record<string, string>>({});
+  const [manualPrice, setManualPrice] = useState<number>(0);
   const { toast } = useToast();
 
   const handlePlatformToggle = (platform: string) => {
@@ -54,22 +55,13 @@ export function ComboForm({ availablePlatforms, onSubmit }: ComboFormProps) {
     return Math.max(0, 5 - account.paidUsers);
   };
 
-  const calculateTotalCost = () => {
-    return selectedPlatforms.reduce((total, platform) => {
-      const account = availablePlatforms.find(acc => acc.platform === platform);
-      if (!account) return total;
-      // Aplicar descuento del 10% por plataforma
-      return total + (account.cost * 0.9);
-    }, 0);
-  };
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!clientName || !clientPhone || selectedPlatforms.length === 0) {
+    if (!clientName || !clientPhone || selectedPlatforms.length === 0 || manualPrice <= 0) {
       toast({
         title: "Error",
-        description: "Por favor completa todos los campos requeridos",
+        description: "Por favor completa todos los campos requeridos, incluyendo el precio",
         variant: "destructive",
       });
       return;
@@ -90,12 +82,14 @@ export function ComboForm({ availablePlatforms, onSubmit }: ComboFormProps) {
       clientPhone,
       selectedPlatforms,
       pins,
+      manualPrice,
     });
 
     setClientName("");
     setClientPhone("");
     setSelectedPlatforms([]);
     setPins({});
+    setManualPrice(0);
 
     toast({
       title: "¡Éxito!",
@@ -184,13 +178,23 @@ export function ComboForm({ availablePlatforms, onSubmit }: ComboFormProps) {
           </div>
 
           <div className="pt-4 border-t">
-            <div className="flex justify-between items-center">
-              <span>Precio regular:</span>
-              <span className="font-medium">${(calculateTotalCost() / 0.9).toFixed(2)}</span>
+            <div>
+              <Label htmlFor="manualPrice">Precio Regular *</Label>
+              <Input
+                id="manualPrice"
+                type="number"
+                step="0.01"
+                min="0"
+                value={manualPrice || ''}
+                onChange={(e) => setManualPrice(Number(e.target.value))}
+                placeholder="Ingrese el precio"
+                required
+                className="mb-2"
+              />
             </div>
             <div className="flex justify-between items-center text-green-600 font-bold">
-              <span>Precio con descuento (10% por plataforma):</span>
-              <span>${calculateTotalCost().toFixed(2)}</span>
+              <span>Precio con descuento (10%):</span>
+              <span>${(manualPrice * 0.9).toFixed(2)}</span>
             </div>
           </div>
         </div>
@@ -199,7 +203,7 @@ export function ComboForm({ availablePlatforms, onSubmit }: ComboFormProps) {
       <Button
         type="submit"
         className="w-full bg-green-600 hover:bg-green-700"
-        disabled={selectedPlatforms.length === 0}
+        disabled={selectedPlatforms.length === 0 || manualPrice <= 0}
       >
         Crear Combo ({selectedPlatforms.length} plataforma{selectedPlatforms.length !== 1 ? 's' : ''})
       </Button>
