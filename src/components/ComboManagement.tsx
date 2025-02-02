@@ -94,7 +94,7 @@ export function ComboManagement({
         comboClients={comboClients}
         onUpdateCombo={onComboUpdate}
         onUpdateClient={onClientUpdate}
-        onDeleteCombo={onDeleteCombo}
+        onDeleteCombo={onComboDelete}
       />
     </div>
   );
