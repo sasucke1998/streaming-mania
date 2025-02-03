@@ -77,7 +77,7 @@ const initialAccounts = [
 const Index = () => {
   const [clients, setClients] = useState(initialClients);
   const [accounts, setAccounts] = useState(initialAccounts);
-  const [activeView, setActiveView] = useState<"dashboard" | "accounts">("dashboard");
+  const [activeView, setActiveView] = useState<"dashboard" | "accounts" | "combos">("dashboard");
   const [isNewAccountDialogOpen, setIsNewAccountDialogOpen] = useState(false);
   const [editingAccount, setEditingAccount] = useState<Account | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -300,7 +300,7 @@ const Index = () => {
         onNewAccount={() => setIsNewAccountDialogOpen(true)}
       />
 
-      {activeView === "dashboard" ? (
+      {activeView === "dashboard" && (
         <>
           <Stats {...stats} />
           <DashboardActions 
@@ -314,18 +314,10 @@ const Index = () => {
             onTogglePaid={handleTogglePaid}
             onDeleteClient={handleDeleteClient}
           />
-          <ComboManagement
-            accounts={accounts}
-            combos={combos}
-            comboClients={comboClients}
-            onComboCreate={handleCreateCombo}
-            onComboClientAdd={handleAddComboClient}
-            onComboUpdate={handleUpdateCombo}
-            onClientUpdate={handleUpdateComboClient}
-            onComboDelete={handleDeleteCombo}
-          />
         </>
-      ) : (
+      )}
+
+      {activeView === "accounts" && (
         <PlatformAccounts 
           accountsByPlatform={accountsByPlatform}
           openPlatforms={openPlatforms}
@@ -335,6 +327,19 @@ const Index = () => {
           onEditClient={handleEditClient}
           onAddClient={handleAddClient}
           onDeleteClient={handleDeleteClient}
+        />
+      )}
+
+      {activeView === "combos" && (
+        <ComboManagement
+          accounts={accounts}
+          combos={combos}
+          comboClients={comboClients}
+          onComboCreate={handleCreateCombo}
+          onComboClientAdd={handleAddComboClient}
+          onComboUpdate={handleUpdateCombo}
+          onClientUpdate={handleUpdateComboClient}
+          onComboDelete={handleDeleteCombo}
         />
       )}
 

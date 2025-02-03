@@ -3,8 +3,8 @@ import { Button } from "./ui/button";
 import { Link } from "react-router-dom";
 
 interface HeaderProps {
-  activeView: "dashboard" | "accounts";
-  setActiveView: (view: "dashboard" | "accounts") => void;
+  activeView: "dashboard" | "accounts" | "combos";
+  setActiveView: (view: "dashboard" | "accounts" | "combos") => void;
   onNewAccount: () => void;
 }
 
@@ -35,6 +35,13 @@ export function Header({ activeView, setActiveView, onNewAccount }: HeaderProps)
           onClick={() => setActiveView("accounts")}
         >
           Cuentas
+        </Button>
+        <Button 
+          variant={activeView === "combos" ? "default" : "outline"}
+          className={activeView === "combos" ? "bg-blue-500 hover:bg-blue-600" : ""}
+          onClick={() => setActiveView("combos")}
+        >
+          Combos
         </Button>
         <Button 
           variant="outline"
