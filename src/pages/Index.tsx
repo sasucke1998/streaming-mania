@@ -114,14 +114,6 @@ const Index = () => {
     const totalProfitAmount = totalPaymentsAmount - totalInvestedAmount;
     const totalCombosCount = combos.length;
 
-    const recurringClientsList = allClients
-      .filter(client => client.visits > 1)
-      .map(client => ({
-        name: client.name,
-        phone: client.phone,
-        visits: client.visits || 1,
-      }));
-
     return {
       totalClients: totalClientsCount,
       totalPayments: totalPaymentsAmount,
@@ -129,7 +121,6 @@ const Index = () => {
       totalInvested: totalInvestedAmount,
       totalProfit: totalProfitAmount,
       totalCombos: totalCombosCount,
-      recurringClients: recurringClientsList,
     };
   };
 
