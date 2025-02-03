@@ -2,6 +2,7 @@ import { BarChart, DollarSign, Users, TrendingUp, Package, Heart } from "lucide-
 import { Card, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
 import { useAdminAuth } from "@/contexts/AdminAuthContext";
+import { useNavigate } from "react-router-dom";
 
 interface AdminDashboardProps {
   totalClients: number;
@@ -27,6 +28,12 @@ export function AdminDashboard({
   recurringClients,
 }: AdminDashboardProps) {
   const { logout } = useAdminAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/admin");
+  };
 
   return (
     <div className="container mx-auto p-6">
@@ -39,7 +46,7 @@ export function AdminDashboard({
           />
           <h1 className="text-3xl font-bold">Panel Administrativo</h1>
         </div>
-        <Button variant="outline" onClick={logout}>
+        <Button variant="outline" onClick={handleLogout}>
           Cerrar Sesión
         </Button>
       </div>

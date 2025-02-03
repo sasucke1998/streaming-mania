@@ -12,7 +12,6 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
 
   const login = (username: string, password: string) => {
-    // For demo purposes - in production, this should be properly secured
     if (username === "admin" && password === "admin123") {
       setIsAdminLoggedIn(true);
       return true;

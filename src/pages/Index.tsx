@@ -106,11 +106,31 @@ const Index = () => {
     return acc;
   }, {} as Record<string, Account[]>);
 
-  const stats = {
-    activeClients: allClients.length,
-    paidClients: allClients.filter(client => client.isPaid).length,
-    unpaidClients: allClients.filter(client => !client.isPaid).length,
-    activeComboClients: comboClients.length,
+  const calculateDashboardStats = () => {
+    const totalClientsCount = allClients.length;
+    const totalPaymentsAmount = allClients.reduce((sum, client) => sum + (client.isPaid ? client.amountDue : 0), 0);
+    const pendingPaymentsAmount = allClients.reduce((sum, client) => sum + (!client.isPaid ? client.amountDue : 0), 0);
+    const totalInvestedAmount = accounts.reduce((sum, account) => sum + account.cost, 0);
+    const totalProfitAmount = totalPaymentsAmount - totalInvestedAmount;
+    const totalCombosCount = combos.length;
+
+    const recurringClientsList = allClients
+      .filter(client => client.visits > 1)
+      .map(client => ({
+        name: client.name,
+        phone: client.phone,
+        visits: client.visits || 1,
+      }));
+
+    return {
+      totalClients: totalClientsCount,
+      totalPayments: totalPaymentsAmount,
+      pendingPayments: pendingPaymentsAmount,
+      totalInvested: totalInvestedAmount,
+      totalProfit: totalProfitAmount,
+      totalCombos: totalCombosCount,
+      recurringClients: recurringClientsList,
+    };
   };
 
   const handleExportToExcel = () => {
@@ -302,7 +322,7 @@ const Index = () => {
 
       {activeView === "dashboard" && (
         <>
-          <Stats {...stats} />
+          <Stats {...calculateDashboardStats()} />
           <DashboardActions 
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
