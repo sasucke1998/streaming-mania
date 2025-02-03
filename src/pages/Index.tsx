@@ -108,6 +108,8 @@ const Index = () => {
 
   const calculateDashboardStats = () => {
     const totalClientsCount = allClients.length;
+    const paidClientsCount = allClients.filter(client => client.isPaid).length;
+    const unpaidClientsCount = totalClientsCount - paidClientsCount;
     const totalPaymentsAmount = allClients.reduce((sum, client) => sum + (client.isPaid ? client.amountDue : 0), 0);
     const pendingPaymentsAmount = allClients.reduce((sum, client) => sum + (!client.isPaid ? client.amountDue : 0), 0);
     const totalInvestedAmount = accounts.reduce((sum, account) => sum + account.cost, 0);
@@ -116,11 +118,14 @@ const Index = () => {
 
     return {
       totalClients: totalClientsCount,
+      paidClients: paidClientsCount,
+      unpaidClients: unpaidClientsCount,
+      totalCombos: totalCombosCount,
+      // Para el AdminDashboard
       totalPayments: totalPaymentsAmount,
       pendingPayments: pendingPaymentsAmount,
       totalInvested: totalInvestedAmount,
       totalProfit: totalProfitAmount,
-      totalCombos: totalCombosCount,
     };
   };
 

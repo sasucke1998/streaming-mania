@@ -1,25 +1,21 @@
-import { Users, CheckCircle, AlertCircle, Package, DollarSign, TrendingUp } from "lucide-react";
+import { Users, CheckCircle, AlertCircle, Package } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
 interface StatsProps {
   totalClients: number;
-  totalPayments: number;
-  pendingPayments: number;
-  totalInvested: number;
-  totalProfit: number;
+  paidClients: number;
+  unpaidClients: number;
   totalCombos: number;
 }
 
 export function Stats({ 
   totalClients,
-  totalPayments,
-  pendingPayments,
-  totalInvested,
-  totalProfit,
+  paidClients,
+  unpaidClients,
   totalCombos
 }: StatsProps) {
   return (
-    <div className="grid gap-4 md:grid-cols-3">
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       <Card>
         <CardContent className="flex flex-col items-center justify-center p-6">
           <Users className="h-12 w-12 text-blue-500 mb-2" />
@@ -29,30 +25,16 @@ export function Stats({
       </Card>
       <Card>
         <CardContent className="flex flex-col items-center justify-center p-6">
-          <DollarSign className="h-12 w-12 text-green-500 mb-2" />
-          <h3 className="text-lg font-medium text-gray-600">Total Pagos</h3>
-          <p className="text-3xl font-bold text-green-500">${totalPayments}</p>
+          <CheckCircle className="h-12 w-12 text-green-500 mb-2" />
+          <h3 className="text-lg font-medium text-gray-600">Clientes Pagos</h3>
+          <p className="text-3xl font-bold text-green-500">{paidClients}</p>
         </CardContent>
       </Card>
       <Card>
         <CardContent className="flex flex-col items-center justify-center p-6">
           <AlertCircle className="h-12 w-12 text-red-500 mb-2" />
-          <h3 className="text-lg font-medium text-gray-600">Pagos Pendientes</h3>
-          <p className="text-3xl font-bold text-red-500">${pendingPayments}</p>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardContent className="flex flex-col items-center justify-center p-6">
-          <TrendingUp className="h-12 w-12 text-purple-500 mb-2" />
-          <h3 className="text-lg font-medium text-gray-600">Total Invertido</h3>
-          <p className="text-3xl font-bold text-purple-500">${totalInvested}</p>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardContent className="flex flex-col items-center justify-center p-6">
-          <DollarSign className="h-12 w-12 text-yellow-500 mb-2" />
-          <h3 className="text-lg font-medium text-gray-600">Ganancias</h3>
-          <p className="text-3xl font-bold text-yellow-500">${totalProfit}</p>
+          <h3 className="text-lg font-medium text-gray-600">Clientes Pendientes</h3>
+          <p className="text-3xl font-bold text-red-500">{unpaidClients}</p>
         </CardContent>
       </Card>
       <Card>
