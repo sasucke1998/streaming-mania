@@ -3,12 +3,14 @@ import { useAdminAuth } from "@/contexts/AdminAuthContext";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 export function AdminLogin() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const { login } = useAdminAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -17,6 +19,7 @@ export function AdminLogin() {
         title: "Inicio de sesión exitoso",
         description: "Bienvenido al panel administrativo",
       });
+      navigate("/admin/dashboard");
     } else {
       toast({
         title: "Error de autenticación",
