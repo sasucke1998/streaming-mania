@@ -1,17 +1,17 @@
-```typescript
+
 import { useState } from "react";
 import { Stats } from "@/components/Stats";
 import { ClientList } from "@/components/ClientList";
-import { useToast } from "@/hooks/use-toast";
 import { NewAccountDialog } from "@/components/NewAccountDialog";
 import { EditAccountDialog } from "@/components/EditAccountDialog";
-import * as XLSX from 'xlsx';
 import { Header } from "@/components/Header";
 import { DashboardActions } from "@/components/DashboardActions";
 import { PlatformAccounts } from "@/components/PlatformAccounts";
-import { Account } from "@/types/account";
 import { ComboManagement } from "@/components/ComboManagement";
-import { PlatformCombo, ComboClient } from "@/types/combo";
+import { useDashboardStats } from "@/hooks/useDashboardStats";
+import { useClientManagement } from "@/hooks/useClientManagement";
+import { useAccountManagement } from "@/hooks/useAccountManagement";
+import { useComboManagement } from "@/hooks/useComboManagement";
 
 const initialClients = [
   {
@@ -78,28 +78,44 @@ const initialAccounts = [
 ];
 
 const Index = () => {
-  const [clients, setClients] = useState(initialClients);
-  const [accounts, setAccounts] = useState(initialAccounts);
   const [activeView, setActiveView] = useState<"dashboard" | "accounts" | "combos">("dashboard");
-  const [isNewAccountDialogOpen, setIsNewAccountDialogOpen] = useState(false);
-  const [editingAccount, setEditingAccount] = useState<Account | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [openPlatforms, setOpenPlatforms] = useState<string[]>([]);
-  const { toast } = useToast();
-  const [combos, setCombos] = useState<PlatformCombo[]>([]);
-  const [comboClients, setComboClients] = useState<ComboClient[]>([]);
+  
+  const {
+    accounts,
+    setAccounts,
+    editingAccount,
+    setEditingAccount,
+    isNewAccountDialogOpen,
+    setIsNewAccountDialogOpen,
+    openPlatforms,
+    handleEditAccount,
+    handleUpdateAccount,
+    handleDeleteAccount,
+    handleNewAccount,
+    togglePlatform
+  } = useAccountManagement(initialAccounts);
 
-  const allClients = accounts.flatMap(account => 
-    account.clients.map(client => ({
-      ...client,
-      platform: account.platform
-    }))
-  );
+  const {
+    searchQuery,
+    setSearchQuery,
+    filteredClients,
+    handleTogglePaid,
+    handleDeleteClient,
+    handleExportToExcel,
+    markAllUnpaid
+  } = useClientManagement(accounts);
 
-  const filteredClients = allClients.filter(client => 
-    client.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    client.phone.includes(searchQuery)
-  );
+  const {
+    combos,
+    comboClients,
+    handleCreateCombo,
+    handleAddComboClient,
+    handleUpdateCombo,
+    handleUpdateComboClient,
+    handleDeleteCombo
+  } = useComboManagement();
+
+  const dashboardStats = useDashboardStats(accounts, combos);
 
   const accountsByPlatform = accounts.reduce((acc, account) => {
     if (!acc[account.platform]) {
@@ -107,213 +123,7 @@ const Index = () => {
     }
     acc[account.platform].push(account);
     return acc;
-  }, {} as Record<string, Account[]>);
-
-  const calculateDashboardStats = () => {
-    const totalClientsCount = allClients.length;
-    const paidClientsCount = allClients.filter(client => client.isPaid).length;
-    const unpaidClientsCount = totalClientsCount - paidClientsCount;
-    const totalPaymentsAmount = allClients.reduce((sum, client) => sum + (client.isPaid ? client.amountDue : 0), 0);
-    const pendingPaymentsAmount = allClients.reduce((sum, client) => sum + (!client.isPaid ? client.amountDue : 0), 0);
-    const totalInvestedAmount = accounts.reduce((sum, account) => sum + account.cost, 0);
-    const totalProfitAmount = totalPaymentsAmount - totalInvestedAmount;
-    const totalCombosCount = combos.length;
-
-    const recurringClientsList = allClients
-      .filter(client => (client.visits || 0) > 5)
-      .map(client => ({
-        name: client.name,
-        phone: client.phone,
-        visits: client.visits || 0
-      }));
-
-    return {
-      totalClients: totalClientsCount,
-      paidClients: paidClientsCount,
-      unpaidClients: unpaidClientsCount,
-      totalCombos: totalCombosCount,
-    };
-  };
-
-  const handleExportToExcel = () => {
-    const clientsData = allClients.map(client => ({
-      Nombre: client.name,
-      Plataforma: client.platform,
-      PIN: client.pin,
-      Teléfono: client.phone,
-      Estado: client.isPaid ? 'Pagado' : 'No Pagado',
-      'Monto Pendiente': client.amountDue
-    }));
-
-    const ws = XLSX.utils.json_to_sheet(clientsData);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Clientes");
-    XLSX.writeFile(wb, "clientes.xlsx");
-
-    toast({
-      title: "Exportación exitosa",
-      description: "Los datos han sido exportados a Excel",
-    });
-  };
-
-  const handleTogglePaid = (clientId: string) => {
-    setAccounts(prevAccounts => 
-      prevAccounts.map(account => ({
-        ...account,
-        clients: account.clients.map(client => 
-          client.id === clientId
-            ? { ...client, isPaid: !client.isPaid }
-            : client
-        )
-      }))
-    );
-
-    toast({
-      title: "Estado actualizado",
-      description: "El estado de pago del cliente ha sido actualizado",
-    });
-  };
-
-  const handleEditAccount = (email: string) => {
-    const account = accounts.find(acc => acc.email === email);
-    if (account) {
-      setEditingAccount(account);
-    }
-  };
-
-  const handleUpdateAccount = (data: { platform: string; email: string; password: string; cost: number }) => {
-    setAccounts(accounts.map(account => 
-      account.email === editingAccount?.email
-        ? { ...account, ...data }
-        : account
-    ));
-    setEditingAccount(null);
-    toast({
-      title: "Cuenta actualizada",
-      description: "Los cambios han sido guardados exitosamente",
-    });
-  };
-
-  const handleDeleteAccount = (email: string) => {
-    setAccounts(accounts.filter(account => account.email !== email));
-  };
-
-  const handleEditClient = (email: string, clientId: string, data: any) => {
-    setAccounts(accounts.map(account => 
-      account.email === email
-        ? {
-            ...account,
-            clients: account.clients.map(client =>
-              client.id === clientId
-                ? { ...client, ...data }
-                : client
-            )
-          }
-        : account
-    ));
-  };
-
-  const handleAddClient = (email: string, data: any) => {
-    setAccounts(accounts.map(account => 
-      account.email === email
-        ? {
-            ...account,
-            clients: [...account.clients, {
-              id: Math.random().toString(36).substr(2, 9),
-              isPaid: false,
-              visits: 0,
-              ...data
-            }]
-          }
-        : account
-    ));
-  };
-
-  const handleDeleteClient = (clientId: string) => {
-    setAccounts(prevAccounts => 
-      prevAccounts.map(account => ({
-        ...account,
-        clients: account.clients.filter(client => client.id !== clientId)
-      }))
-    );
-    
-    toast({
-      title: "Cliente eliminado",
-      description: "El cliente ha sido eliminado exitosamente",
-    });
-  };
-
-  const handleNewAccount = (data: { platform: string; email: string; password: string; cost: number }) => {
-    setAccounts([
-      ...accounts,
-      {
-        ...data,
-        paidUsers: 0,
-        totalUsers: 0,
-        clients: [],
-      },
-    ]);
-  };
-
-  const togglePlatform = (platform: string) => {
-    setOpenPlatforms(prev => 
-      prev.includes(platform) 
-        ? prev.filter(p => p !== platform)
-        : [...prev, platform]
-    );
-  };
-
-  const markAllUnpaid = () => {
-    setAccounts(prevAccounts => 
-      prevAccounts.map(account => ({
-        ...account,
-        clients: account.clients.map(client => ({
-          ...client,
-          isPaid: false
-        }))
-      }))
-    );
-    toast({
-      title: "Actualización masiva",
-      description: "Todas las cuentas han sido marcadas como no pagadas",
-    });
-  };
-
-  const handleCreateCombo = (comboData: Omit<PlatformCombo, "id">) => {
-    const newComboId = Math.random().toString(36).substr(2, 9);
-    const newCombo: PlatformCombo = {
-      id: newComboId,
-      ...comboData,
-    };
-    setCombos(prevCombos => [...prevCombos, newCombo]);
-    return newComboId; // Return the ID for immediate use
-  };
-
-  const handleAddComboClient = (clientData: Omit<ComboClient, "id">, comboId: string) => {
-    const newClient: ComboClient = {
-      id: Math.random().toString(36).substr(2, 9),
-      comboId: comboId,
-      ...clientData,
-    };
-    setComboClients(prevClients => [...prevClients, newClient]);
-  };
-
-  const handleUpdateCombo = (comboId: string, updatedData: Partial<PlatformCombo>) => {
-    setCombos(prev => prev.map(combo => 
-      combo.id === comboId ? { ...combo, ...updatedData } : combo
-    ));
-  };
-
-  const handleUpdateComboClient = (clientId: string, updatedData: Partial<ComboClient>) => {
-    setComboClients(prev => prev.map(client =>
-      client.id === clientId ? { ...client, ...updatedData } : client
-    ));
-  };
-
-  const handleDeleteCombo = (comboId: string) => {
-    setCombos(prev => prev.filter(combo => combo.id !== comboId));
-    setComboClients(prev => prev.filter(client => client.comboId !== comboId));
-  };
+  }, {} as Record<string, typeof accounts[0][]>);
 
   return (
     <div className="container mx-auto py-6">
@@ -325,7 +135,7 @@ const Index = () => {
 
       {activeView === "dashboard" && (
         <>
-          <Stats {...calculateDashboardStats()} />
+          <Stats {...dashboardStats} />
           <DashboardActions 
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
@@ -347,9 +157,41 @@ const Index = () => {
           onTogglePlatform={togglePlatform}
           onEdit={handleEditAccount}
           onDelete={handleDeleteAccount}
-          onEditClient={handleEditClient}
-          onAddClient={handleAddClient}
-          onDeleteClient={handleDeleteClient}
+          onEditClient={(email, clientId, data) => {
+            setAccounts(accounts.map(account => 
+              account.email === email
+                ? {
+                    ...account,
+                    clients: account.clients.map(client =>
+                      client.id === clientId
+                        ? { ...client, ...data }
+                        : client
+                    )
+                  }
+                : account
+            ));
+          }}
+          onAddClient={(email, data) => {
+            setAccounts(accounts.map(account => 
+              account.email === email
+                ? {
+                    ...account,
+                    clients: [...account.clients, {
+                      id: Math.random().toString(36).substr(2, 9),
+                      isPaid: false,
+                      visits: 0,
+                      ...data
+                    }]
+                  }
+                : account
+            ));
+          }}
+          onDeleteClient={(email, clientId) => {
+            setAccounts(accounts.map(account => ({
+              ...account,
+              clients: account.clients.filter(client => client.id !== clientId)
+            })));
+          }}
         />
       )}
 
@@ -385,4 +227,3 @@ const Index = () => {
 };
 
 export default Index;
-```
