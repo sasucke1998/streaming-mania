@@ -117,16 +117,25 @@ const Index = () => {
     const totalProfitAmount = totalPaymentsAmount - totalInvestedAmount;
     const totalCombosCount = combos.length;
 
+    // Calculate recurring clients (clients with visits > 5)
+    const recurringClientsList = allClients
+      .filter(client => (client.visits || 0) > 5)
+      .map(client => ({
+        name: client.name,
+        phone: client.phone,
+        visits: client.visits || 0
+      }));
+
     return {
       totalClients: totalClientsCount,
       paidClients: paidClientsCount,
       unpaidClients: unpaidClientsCount,
       totalCombos: totalCombosCount,
-      // Para el AdminDashboard
       totalPayments: totalPaymentsAmount,
       pendingPayments: pendingPaymentsAmount,
       totalInvested: totalInvestedAmount,
       totalProfit: totalProfitAmount,
+      recurringClients: recurringClientsList
     };
   };
 
