@@ -11,6 +11,7 @@ import { PlatformAccounts } from "@/components/PlatformAccounts";
 import { Account } from "@/types/account";
 import { ComboManagement } from "@/components/ComboManagement";
 import { PlatformCombo, ComboClient } from "@/types/combo";
+import { AdminDashboard } from "@/components/AdminDashboard";
 
 const initialClients = [
   {
@@ -319,6 +320,9 @@ const Index = () => {
       {activeView === "dashboard" && (
         <>
           <Stats {...calculateDashboardStats()} />
+          <div className="mt-8">
+            <AdminDashboard {...calculateDashboardStats()} />
+          </div>
           <DashboardActions 
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
