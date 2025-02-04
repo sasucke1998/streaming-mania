@@ -117,7 +117,6 @@ const Index = () => {
     const totalProfitAmount = totalPaymentsAmount - totalInvestedAmount;
     const totalCombosCount = combos.length;
 
-    // Calculate recurring clients (clients with visits > 5)
     const recurringClientsList = allClients
       .filter(client => (client.visits || 0) > 5)
       .map(client => ({
@@ -330,7 +329,15 @@ const Index = () => {
         <>
           <Stats {...calculateDashboardStats()} />
           <div className="mt-8">
-            <AdminDashboard {...calculateDashboardStats()} />
+            <AdminDashboard 
+              totalClients={calculateDashboardStats().totalClients}
+              totalPayments={calculateDashboardStats().totalPayments}
+              pendingPayments={calculateDashboardStats().pendingPayments}
+              totalInvested={calculateDashboardStats().totalInvested}
+              totalProfit={calculateDashboardStats().totalProfit}
+              totalCombos={calculateDashboardStats().totalCombos}
+              recurringClients={calculateDashboardStats().recurringClients}
+            />
           </div>
           <DashboardActions 
             searchQuery={searchQuery}

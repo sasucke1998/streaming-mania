@@ -12,6 +12,6 @@ export interface Account {
     phone: string;
     isPaid: boolean;
     amountDue: number;
-    visits?: number;
+    visits: number;
   }[];
 }
