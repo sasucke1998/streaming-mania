@@ -1,3 +1,4 @@
+```typescript
 import { useState } from "react";
 import { Stats } from "@/components/Stats";
 import { ClientList } from "@/components/ClientList";
@@ -11,7 +12,6 @@ import { PlatformAccounts } from "@/components/PlatformAccounts";
 import { Account } from "@/types/account";
 import { ComboManagement } from "@/components/ComboManagement";
 import { PlatformCombo, ComboClient } from "@/types/combo";
-import { AdminDashboard } from "@/components/AdminDashboard";
 
 const initialClients = [
   {
@@ -132,11 +132,6 @@ const Index = () => {
       paidClients: paidClientsCount,
       unpaidClients: unpaidClientsCount,
       totalCombos: totalCombosCount,
-      totalPayments: totalPaymentsAmount,
-      pendingPayments: pendingPaymentsAmount,
-      totalInvested: totalInvestedAmount,
-      totalProfit: totalProfitAmount,
-      recurringClients: recurringClientsList
     };
   };
 
@@ -331,17 +326,6 @@ const Index = () => {
       {activeView === "dashboard" && (
         <>
           <Stats {...calculateDashboardStats()} />
-          <div className="mt-8">
-            <AdminDashboard 
-              totalClients={calculateDashboardStats().totalClients}
-              totalPayments={calculateDashboardStats().totalPayments}
-              pendingPayments={calculateDashboardStats().pendingPayments}
-              totalInvested={calculateDashboardStats().totalInvested}
-              totalProfit={calculateDashboardStats().totalProfit}
-              totalCombos={calculateDashboardStats().totalCombos}
-              recurringClients={calculateDashboardStats().recurringClients}
-            />
-          </div>
           <DashboardActions 
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
@@ -401,3 +385,4 @@ const Index = () => {
 };
 
 export default Index;
+```
