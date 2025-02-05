@@ -1,4 +1,3 @@
-
 import { Stats } from "@/components/Stats";
 import { DashboardActions } from "@/components/DashboardActions";
 import { PlatformAccounts } from "@/components/PlatformAccounts";
@@ -29,7 +28,7 @@ export function AdminDashboard() {
   ];
 
   const mockCombos = [
-    { id: "1", name: "Combo Básico", platforms: ["Netflix", "Disney+"], price: 25.99 }
+    { id: "1", name: "Combo Básico", platforms: ["Netflix", "Disney+"], cost: 25.99 }
   ];
 
   const stats = useDashboardStats(mockAccounts, mockCombos);
@@ -97,10 +96,14 @@ export function AdminDashboard() {
 
       {activeView === "combos" && (
         <ComboManagement 
+          accounts={mockAccounts}
           combos={mockCombos}
-          onAdd={() => {}}
-          onEdit={() => {}}
-          onDelete={() => {}}
+          comboClients={[]}
+          onComboCreate={() => ""}
+          onComboClientAdd={() => {}}
+          onComboUpdate={() => {}}
+          onClientUpdate={() => {}}
+          onComboDelete={() => {}}
         />
       )}
     </div>
