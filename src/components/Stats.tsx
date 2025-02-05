@@ -1,6 +1,6 @@
 
 import { Card, CardContent } from "@/components/ui/card";
-import { Users, DollarSign, TrendingUp, Wallet, Activity, CreditCard } from "lucide-react";
+import { Users, CreditCard } from "lucide-react";
 
 interface StatsProps {
   totalClients: number;
@@ -11,6 +11,7 @@ interface StatsProps {
   totalRevenue?: number;
   monthlyRevenue?: number;
   averageClientValue?: number;
+  showFinancialStats?: boolean;
 }
 
 export function Stats({ 
@@ -21,7 +22,8 @@ export function Stats({
   totalInvestment = 0,
   totalRevenue = 0,
   monthlyRevenue = 0,
-  averageClientValue = 0
+  averageClientValue = 0,
+  showFinancialStats = false
 }: StatsProps) {
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -30,31 +32,6 @@ export function Stats({
           <Users className="h-12 w-12 text-blue-500 mb-2" />
           <h3 className="text-lg font-medium text-gray-600">Total Clientes</h3>
           <p className="text-3xl font-bold text-blue-500">{totalClients}</p>
-        </CardContent>
-      </Card>
-      
-      <Card>
-        <CardContent className="flex flex-col items-center justify-center p-6">
-          <DollarSign className="h-12 w-12 text-green-500 mb-2" />
-          <h3 className="text-lg font-medium text-gray-600">Ingresos Totales</h3>
-          <p className="text-3xl font-bold text-green-500">${totalRevenue.toFixed(2)}</p>
-          <p className="text-sm text-gray-500">Mensual: ${monthlyRevenue.toFixed(2)}</p>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardContent className="flex flex-col items-center justify-center p-6">
-          <Wallet className="h-12 w-12 text-purple-500 mb-2" />
-          <h3 className="text-lg font-medium text-gray-600">Inversión Total</h3>
-          <p className="text-3xl font-bold text-purple-500">${totalInvestment.toFixed(2)}</p>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardContent className="flex flex-col items-center justify-center p-6">
-          <TrendingUp className="h-12 w-12 text-orange-500 mb-2" />
-          <h3 className="text-lg font-medium text-gray-600">Valor por Cliente</h3>
-          <p className="text-3xl font-bold text-orange-500">${averageClientValue.toFixed(2)}</p>
         </CardContent>
       </Card>
 
@@ -82,15 +59,44 @@ export function Stats({
         </CardContent>
       </Card>
 
-      <Card>
-        <CardContent className="flex flex-col items-center justify-center p-6">
-          <Activity className="h-12 w-12 text-yellow-500 mb-2" />
-          <h3 className="text-lg font-medium text-gray-600">Tasa de Pago</h3>
-          <p className="text-3xl font-bold text-yellow-500">
-            {totalClients > 0 ? ((paidClients / totalClients) * 100).toFixed(1) : 0}%
-          </p>
-        </CardContent>
-      </Card>
+      {showFinancialStats && (
+        <>
+          <Card>
+            <CardContent className="flex flex-col items-center justify-center p-6">
+              <DollarSign className="h-12 w-12 text-green-500 mb-2" />
+              <h3 className="text-lg font-medium text-gray-600">Ingresos Totales</h3>
+              <p className="text-3xl font-bold text-green-500">${totalRevenue.toFixed(2)}</p>
+              <p className="text-sm text-gray-500">Mensual: ${monthlyRevenue.toFixed(2)}</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="flex flex-col items-center justify-center p-6">
+              <Wallet className="h-12 w-12 text-purple-500 mb-2" />
+              <h3 className="text-lg font-medium text-gray-600">Inversión Total</h3>
+              <p className="text-3xl font-bold text-purple-500">${totalInvestment.toFixed(2)}</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="flex flex-col items-center justify-center p-6">
+              <TrendingUp className="h-12 w-12 text-orange-500 mb-2" />
+              <h3 className="text-lg font-medium text-gray-600">Valor por Cliente</h3>
+              <p className="text-3xl font-bold text-orange-500">${averageClientValue.toFixed(2)}</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="flex flex-col items-center justify-center p-6">
+              <Activity className="h-12 w-12 text-yellow-500 mb-2" />
+              <h3 className="text-lg font-medium text-gray-600">Tasa de Pago</h3>
+              <p className="text-3xl font-bold text-yellow-500">
+                {totalClients > 0 ? ((paidClients / totalClients) * 100).toFixed(1) : 0}%
+              </p>
+            </CardContent>
+          </Card>
+        </>
+      )}
     </div>
   );
 }

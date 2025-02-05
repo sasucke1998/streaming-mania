@@ -135,7 +135,13 @@ const Index = () => {
 
       {activeView === "dashboard" && (
         <>
-          <Stats {...dashboardStats} />
+          <Stats 
+            totalClients={dashboardStats.totalClients}
+            paidClients={dashboardStats.paidClients}
+            unpaidClients={dashboardStats.unpaidClients}
+            totalCombos={dashboardStats.totalCombos}
+            showFinancialStats={false}
+          />
           <DashboardActions 
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}

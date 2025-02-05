@@ -84,7 +84,10 @@ export function AdminDashboard() {
 
       {activeView === "dashboard" && (
         <div className="space-y-6">
-          <Stats {...stats} />
+          <Stats 
+            {...stats}
+            showFinancialStats={true}
+          />
           <DashboardActions
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
