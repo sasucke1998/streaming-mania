@@ -20,6 +20,8 @@ export function AdminDashboard() {
     {
       platform: "Netflix",
       cost: 15.99,
+      totalUsers: 2,  // Added missing property
+      paidUsers: 1,   // Added missing property
       clients: [
         { id: "1", name: "Juan Pérez", isPaid: true, visits: 12 },
         { id: "2", name: "María García", isPaid: false, visits: 8 }
