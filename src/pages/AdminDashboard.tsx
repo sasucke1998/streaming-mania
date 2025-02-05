@@ -7,79 +7,137 @@ import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { useAdminAuth } from "@/contexts/AdminAuthContext";
 import { ComboManagement } from "@/components/ComboManagement";
+import { ClientList } from "@/components/ClientList";
+import { useClientManagement } from "@/hooks/useClientManagement";
+import { useAccountManagement } from "@/hooks/useAccountManagement";
+import { useComboManagement } from "@/hooks/useComboManagement";
 import { useDashboardStats } from "@/hooks/useDashboardStats";
+
+const initialClients = [
+  {
+    id: "1",
+    name: "Kiko",
+    platform: "Netflix",
+    pin: "5456",
+    phone: "58860558",
+    isPaid: true,
+    amountDue: 15.99,
+    visits: 0
+  },
+  {
+    id: "2",
+    name: "Juan Jose",
+    platform: "Disney+",
+    pin: "5659",
+    phone: "+18097532939",
+    isPaid: true,
+    amountDue: 9.99,
+    visits: 0
+  },
+];
+
+const initialAccounts = [
+  {
+    platform: "Netflix",
+    email: "sasuckeking@gmail.com",
+    password: "gcdegg",
+    cost: 15.99,
+    paidUsers: 1,
+    totalUsers: 1,
+    clients: [
+      {
+        id: "1",
+        name: "Kiko",
+        pin: "5456",
+        phone: "58860558",
+        isPaid: true,
+        amountDue: 15.99,
+        visits: 0
+      }
+    ],
+  },
+  {
+    platform: "Disney+",
+    email: "nelsonmarketingdigital@gmail.com",
+    password: "disney123",
+    cost: 9.99,
+    paidUsers: 1,
+    totalUsers: 1,
+    clients: [
+      {
+        id: "2",
+        name: "Juan Jose",
+        pin: "5659",
+        phone: "+18097532939",
+        isPaid: true,
+        amountDue: 9.99,
+        visits: 0
+      }
+    ],
+  },
+];
 
 export function AdminDashboard() {
   const [activeView, setActiveView] = useState<"dashboard" | "accounts" | "combos">("dashboard");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [openPlatforms, setOpenPlatforms] = useState<string[]>([]);
   const navigate = useNavigate();
   const { isAdminLoggedIn } = useAdminAuth();
 
-  // Mock data with more realistic values
-  const mockAccounts = [
-    {
-      platform: "Netflix",
-      cost: 15.99,
-      totalUsers: 10,
-      paidUsers: 8,
-      clients: [
-        { id: "1", name: "Juan Pérez", isPaid: true, visits: 12 },
-        { id: "2", name: "María García", isPaid: true, visits: 8 },
-        { id: "3", name: "Carlos López", isPaid: true, visits: 15 },
-        { id: "4", name: "Ana Martínez", isPaid: false, visits: 5 }
-      ]
-    },
-    {
-      platform: "Disney+",
-      cost: 12.99,
-      totalUsers: 8,
-      paidUsers: 6,
-      clients: [
-        { id: "5", name: "Pedro Sánchez", isPaid: true, visits: 10 },
-        { id: "6", name: "Laura Torres", isPaid: true, visits: 7 }
-      ]
-    }
-  ];
+  const {
+    accounts,
+    setAccounts,
+    editingAccount,
+    setEditingAccount,
+    isNewAccountDialogOpen,
+    setIsNewAccountDialogOpen,
+    openPlatforms,
+    handleEditAccount,
+    handleUpdateAccount,
+    handleDeleteAccount,
+    handleNewAccount,
+    togglePlatform
+  } = useAccountManagement(initialAccounts);
 
-  const mockCombos = [
-    { id: "1", name: "Combo Básico", platforms: ["Netflix", "Disney+"], cost: 25.99 },
-    { id: "2", name: "Combo Premium", platforms: ["Netflix", "Disney+", "HBO"], cost: 35.99 }
-  ];
+  const {
+    searchQuery,
+    setSearchQuery,
+    filteredClients,
+    handleTogglePaid,
+    handleDeleteClient,
+    handleExportToExcel,
+    markAllUnpaid
+  } = useClientManagement(accounts);
 
-  const stats = useDashboardStats(mockAccounts, mockCombos);
+  const {
+    combos,
+    comboClients,
+    handleCreateCombo,
+    handleAddComboClient,
+    handleUpdateCombo,
+    handleUpdateComboClient,
+    handleDeleteCombo
+  } = useComboManagement();
+
+  const stats = useDashboardStats(accounts, combos);
 
   if (!isAdminLoggedIn) {
     navigate("/admin");
     return null;
   }
 
-  const handleNewAccount = () => {
-    // Implement new account functionality
-  };
-
-  const handleTogglePlatform = (platform: string) => {
-    setOpenPlatforms(prev =>
-      prev.includes(platform)
-        ? prev.filter(p => p !== platform)
-        : [...prev, platform]
-    );
-  };
-
-  const handleExportToExcel = () => {
-    // Implement export functionality
-  };
-
-  const handleMarkAllUnpaid = () => {
-    // Implement mark all unpaid functionality
-  };
+  const accountsByPlatform = accounts.reduce((acc, account) => {
+    if (!acc[account.platform]) {
+      acc[account.platform] = [];
+    }
+    acc[account.platform].push(account);
+    return acc;
+  }, {} as Record<string, typeof accounts[0][]>);
 
   return (
     <div className="container mx-auto p-6 max-w-7xl">
       <Header
         activeView={activeView}
         setActiveView={setActiveView}
-        onNewAccount={handleNewAccount}
+        onNewAccount={() => setIsNewAccountDialogOpen(true)}
       />
 
       {activeView === "dashboard" && (
@@ -92,39 +150,74 @@ export function AdminDashboard() {
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
             onExportToExcel={handleExportToExcel}
-            onMarkAllUnpaid={handleMarkAllUnpaid}
+            onMarkAllUnpaid={markAllUnpaid}
+          />
+          <ClientList 
+            clients={filteredClients}
+            onTogglePaid={handleTogglePaid}
+            onDeleteClient={handleDeleteClient}
           />
         </div>
       )}
 
       {activeView === "accounts" && (
         <PlatformAccounts
-          accountsByPlatform={mockAccounts.reduce((acc, account) => ({
-            ...acc,
-            [account.platform]: [account]
-          }), {})}
+          accountsByPlatform={accountsByPlatform}
           openPlatforms={openPlatforms}
-          onTogglePlatform={handleTogglePlatform}
-          onEdit={() => {}}
-          onDelete={() => {}}
-          onEditClient={() => {}}
-          onAddClient={() => {}}
-          onDeleteClient={() => {}}
+          onTogglePlatform={togglePlatform}
+          onEdit={handleEditAccount}
+          onDelete={handleDeleteAccount}
+          onEditClient={(email, clientId, data) => {
+            setAccounts(accounts.map(account => 
+              account.email === email
+                ? {
+                    ...account,
+                    clients: account.clients.map(client =>
+                      client.id === clientId
+                        ? { ...client, ...data }
+                        : client
+                    )
+                  }
+                : account
+            ));
+          }}
+          onAddClient={(email, data) => {
+            setAccounts(accounts.map(account => 
+              account.email === email
+                ? {
+                    ...account,
+                    clients: [...account.clients, {
+                      id: Math.random().toString(36).substr(2, 9),
+                      isPaid: false,
+                      visits: 0,
+                      ...data
+                    }]
+                  }
+                : account
+            ));
+          }}
+          onDeleteClient={(email, clientId) => {
+            setAccounts(accounts.map(account => ({
+              ...account,
+              clients: account.clients.filter(client => client.id !== clientId)
+            })));
+          }}
         />
       )}
 
       {activeView === "combos" && (
         <ComboManagement 
-          accounts={mockAccounts}
-          combos={mockCombos}
-          comboClients={[]}
-          onComboCreate={() => ""}
-          onComboClientAdd={() => {}}
-          onComboUpdate={() => {}}
-          onClientUpdate={() => {}}
-          onComboDelete={() => {}}
+          accounts={accounts}
+          combos={combos}
+          comboClients={comboClients}
+          onComboCreate={handleCreateCombo}
+          onComboClientAdd={handleAddComboClient}
+          onComboUpdate={handleUpdateCombo}
+          onClientUpdate={handleUpdateComboClient}
+          onComboDelete={handleDeleteCombo}
         />
       )}
     </div>
   );
 }
+
