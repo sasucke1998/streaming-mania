@@ -1,6 +1,6 @@
 
 import { Card, CardContent } from "@/components/ui/card";
-import { Users, CreditCard } from "lucide-react";
+import { Users, CreditCard, DollarSign, Wallet, TrendingUp, Activity } from "lucide-react";
 
 interface StatsProps {
   totalClients: number;
