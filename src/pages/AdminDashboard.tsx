@@ -1,3 +1,4 @@
+
 import { Stats } from "@/components/Stats";
 import { DashboardActions } from "@/components/DashboardActions";
 import { PlatformAccounts } from "@/components/PlatformAccounts";
@@ -15,22 +16,35 @@ export function AdminDashboard() {
   const navigate = useNavigate();
   const { isAdminLoggedIn } = useAdminAuth();
 
-  // Temporary mock data - replace with real data later
+  // Mock data with more realistic values
   const mockAccounts = [
     {
       platform: "Netflix",
       cost: 15.99,
-      totalUsers: 2,  // Added missing property
-      paidUsers: 1,   // Added missing property
+      totalUsers: 10,
+      paidUsers: 8,
       clients: [
         { id: "1", name: "Juan Pérez", isPaid: true, visits: 12 },
-        { id: "2", name: "María García", isPaid: false, visits: 8 }
+        { id: "2", name: "María García", isPaid: true, visits: 8 },
+        { id: "3", name: "Carlos López", isPaid: true, visits: 15 },
+        { id: "4", name: "Ana Martínez", isPaid: false, visits: 5 }
+      ]
+    },
+    {
+      platform: "Disney+",
+      cost: 12.99,
+      totalUsers: 8,
+      paidUsers: 6,
+      clients: [
+        { id: "5", name: "Pedro Sánchez", isPaid: true, visits: 10 },
+        { id: "6", name: "Laura Torres", isPaid: true, visits: 7 }
       ]
     }
   ];
 
   const mockCombos = [
-    { id: "1", name: "Combo Básico", platforms: ["Netflix", "Disney+"], cost: 25.99 }
+    { id: "1", name: "Combo Básico", platforms: ["Netflix", "Disney+"], cost: 25.99 },
+    { id: "2", name: "Combo Premium", platforms: ["Netflix", "Disney+", "HBO"], cost: 35.99 }
   ];
 
   const stats = useDashboardStats(mockAccounts, mockCombos);
