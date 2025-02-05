@@ -1,17 +1,14 @@
 
-import { Stats } from "@/components/Stats";
-import { DashboardActions } from "@/components/DashboardActions";
-import { PlatformAccounts } from "@/components/PlatformAccounts";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { useAdminAuth } from "@/contexts/AdminAuthContext";
-import { ComboManagement } from "@/components/ComboManagement";
-import { ClientList } from "@/components/ClientList";
 import { useClientManagement } from "@/hooks/useClientManagement";
 import { useAccountManagement } from "@/hooks/useAccountManagement";
 import { useComboManagement } from "@/hooks/useComboManagement";
-import { useDashboardStats } from "@/hooks/useDashboardStats";
+import { DashboardContent } from "./admin/Dashboard/DashboardContent";
+import { AccountsContent } from "./admin/Dashboard/AccountsContent";
+import { CombosContent } from "./admin/Dashboard/CombosContent";
 
 const initialClients = [
   {
@@ -44,17 +41,7 @@ const initialAccounts = [
     cost: 15.99,
     paidUsers: 1,
     totalUsers: 1,
-    clients: [
-      {
-        id: "1",
-        name: "Kiko",
-        pin: "5456",
-        phone: "58860558",
-        isPaid: true,
-        amountDue: 15.99,
-        visits: 0
-      }
-    ],
+    clients: [initialClients[0]],
   },
   {
     platform: "Disney+",
@@ -63,17 +50,7 @@ const initialAccounts = [
     cost: 9.99,
     paidUsers: 1,
     totalUsers: 1,
-    clients: [
-      {
-        id: "2",
-        name: "Juan Jose",
-        pin: "5659",
-        phone: "+18097532939",
-        isPaid: true,
-        amountDue: 9.99,
-        visits: 0
-      }
-    ],
+    clients: [initialClients[1]],
   },
 ];
 
@@ -98,16 +75,6 @@ export function AdminDashboard() {
   } = useAccountManagement(initialAccounts);
 
   const {
-    searchQuery,
-    setSearchQuery,
-    filteredClients,
-    handleTogglePaid,
-    handleDeleteClient,
-    handleExportToExcel,
-    markAllUnpaid
-  } = useClientManagement(accounts);
-
-  const {
     combos,
     comboClients,
     handleCreateCombo,
@@ -116,8 +83,6 @@ export function AdminDashboard() {
     handleUpdateComboClient,
     handleDeleteCombo
   } = useComboManagement();
-
-  const stats = useDashboardStats(accounts, combos);
 
   if (!isAdminLoggedIn) {
     navigate("/admin");
@@ -141,32 +106,16 @@ export function AdminDashboard() {
       />
 
       {activeView === "dashboard" && (
-        <div className="space-y-6">
-          <Stats 
-            {...stats}
-            showFinancialStats={true}
-          />
-          <DashboardActions
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            onExportToExcel={handleExportToExcel}
-            onMarkAllUnpaid={markAllUnpaid}
-          />
-          <ClientList 
-            clients={filteredClients}
-            onTogglePaid={handleTogglePaid}
-            onDeleteClient={handleDeleteClient}
-          />
-        </div>
+        <DashboardContent accounts={accounts} />
       )}
 
       {activeView === "accounts" && (
-        <PlatformAccounts
-          accountsByPlatform={accountsByPlatform}
+        <AccountsContent
+          accounts={accounts}
           openPlatforms={openPlatforms}
           onTogglePlatform={togglePlatform}
-          onEdit={handleEditAccount}
-          onDelete={handleDeleteAccount}
+          onEditAccount={handleEditAccount}
+          onDeleteAccount={handleDeleteAccount}
           onEditClient={(email, clientId, data) => {
             setAccounts(accounts.map(account => 
               account.email === email
@@ -202,11 +151,12 @@ export function AdminDashboard() {
               clients: account.clients.filter(client => client.id !== clientId)
             })));
           }}
+          accountsByPlatform={accountsByPlatform}
         />
       )}
 
       {activeView === "combos" && (
-        <ComboManagement 
+        <CombosContent
           accounts={accounts}
           combos={combos}
           comboClients={comboClients}
@@ -220,4 +170,3 @@ export function AdminDashboard() {
     </div>
   );
 }
-
