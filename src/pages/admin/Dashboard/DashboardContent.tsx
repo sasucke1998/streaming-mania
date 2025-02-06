@@ -1,4 +1,3 @@
-
 import { Stats } from "@/components/Stats";
 import { DashboardActions } from "@/components/DashboardActions";
 import { ClientList } from "@/components/ClientList";
@@ -24,22 +23,36 @@ export function DashboardContent({ accounts }: DashboardContentProps) {
   const stats = useDashboardStats(accounts, []);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-6">
+      <h1 className="text-3xl font-bold mb-8">Panel de Control</h1>
+      
       <Stats 
-        {...stats}
+        totalClients={stats.totalClients}
+        paidClients={stats.paidClients}
+        unpaidClients={stats.unpaidClients}
+        totalCombos={stats.totalCombos}
+        totalInvestment={stats.totalInvestment}
+        totalRevenue={stats.totalRevenue}
+        monthlyRevenue={stats.monthlyRevenue}
+        averageClientValue={stats.averageClientValue}
         showFinancialStats={true}
       />
+      
       <DashboardActions
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         onExportToExcel={handleExportToExcel}
         onMarkAllUnpaid={markAllUnpaid}
       />
-      <ClientList 
-        clients={filteredClients}
-        onTogglePaid={handleTogglePaid}
-        onDeleteClient={handleDeleteClient}
-      />
+      
+      <div className="bg-white rounded-lg shadow">
+        <h2 className="text-xl font-semibold p-4 border-b">Lista de Clientes</h2>
+        <ClientList 
+          clients={filteredClients}
+          onTogglePaid={handleTogglePaid}
+          onDeleteClient={handleDeleteClient}
+        />
+      </div>
     </div>
   );
 }
