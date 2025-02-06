@@ -1,4 +1,3 @@
-
 interface DashboardStats {
   totalClients: number;
   paidClients: number;
@@ -14,7 +13,7 @@ interface Client {
   id: string;
   name: string;
   isPaid: boolean;
-  visits: number;
+  amountDue: number;
 }
 
 interface Account {
@@ -27,32 +26,30 @@ export const useDashboardStats = (
   accounts: Account[],
   combos: any[]
 ): DashboardStats => {
-  const allClients = accounts.flatMap(account => 
-    account.clients.map(client => ({
-      ...client,
-      platform: account.platform,
-      accountCost: account.cost
-    }))
-  );
+  // Obtener todos los clientes de todas las cuentas
+  const allClients = accounts.flatMap(account => account.clients);
 
+  // Calcular estadísticas básicas
   const totalClientsCount = allClients.length;
   const paidClientsCount = allClients.filter(client => client.isPaid).length;
   const unpaidClientsCount = totalClientsCount - paidClientsCount;
   const totalCombosCount = combos.length;
 
-  // Calculate financial metrics
+  // Calcular estadísticas financieras
   const totalInvestment = accounts.reduce((total, account) => total + account.cost, 0);
   
-  // Assuming each paid client generates revenue equal to their platform cost + 30% margin
+  // Calcular ingresos totales (suma de amountDue de clientes pagados)
   const totalRevenue = allClients
     .filter(client => client.isPaid)
-    .reduce((total, client) => total + (client.accountCost * 1.3), 0);
+    .reduce((total, client) => total + client.amountDue, 0);
 
-  // Monthly revenue is calculated as total revenue / 12 (simplified)
+  // Calcular ingreso mensual promedio
   const monthlyRevenue = totalRevenue / 12;
 
-  // Average revenue per client
-  const averageClientValue = totalClientsCount > 0 ? totalRevenue / totalClientsCount : 0;
+  // Calcular valor promedio por cliente
+  const averageClientValue = totalClientsCount > 0 
+    ? totalRevenue / totalClientsCount 
+    : 0;
 
   return {
     totalClients: totalClientsCount,

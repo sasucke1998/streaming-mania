@@ -22,6 +22,8 @@ export function DashboardContent({ accounts }: DashboardContentProps) {
 
   const stats = useDashboardStats(accounts, []);
 
+  console.log('Dashboard Stats:', stats); // Para debugging
+
   return (
     <div className="space-y-6 p-6">
       <h1 className="text-3xl font-bold mb-8">Panel de Control</h1>
