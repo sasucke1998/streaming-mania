@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { ComboFormData } from "@/types/combo";
 import { useToast } from "@/hooks/use-toast";
+import { ComboFormData } from "@/types/combo";
+import { ClientInfoFields } from "./combo-form/ClientInfoFields";
+import { PlatformSelection } from "./combo-form/PlatformSelection";
+import { PinAssignment } from "./combo-form/PinAssignment";
 
 interface ComboFormProps {
   availablePlatforms: {
@@ -33,26 +33,12 @@ export function ComboForm({ availablePlatforms, onSubmit }: ComboFormProps) {
         return newPins;
       });
     } else {
-      if (getAvailableSpots(platform) > 0) {
-        setSelectedPlatforms(prev => [...prev, platform]);
-        setPins(prev => ({
-          ...prev,
-          [platform]: Math.floor(1000 + Math.random() * 9000).toString()
-        }));
-      } else {
-        toast({
-          title: "Error",
-          description: "Esta plataforma no tiene espacios disponibles",
-          variant: "destructive",
-        });
-      }
+      setSelectedPlatforms(prev => [...prev, platform]);
+      setPins(prev => ({
+        ...prev,
+        [platform]: Math.floor(1000 + Math.random() * 9000).toString()
+      }));
     }
-  };
-
-  const getAvailableSpots = (platform: string) => {
-    const account = availablePlatforms.find(acc => acc.platform === platform);
-    if (!account) return 0;
-    return Math.max(0, 5 - account.paidUsers);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -99,105 +85,27 @@ export function ComboForm({ availablePlatforms, onSubmit }: ComboFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="space-y-4">
-        <div>
-          <Label htmlFor="clientName">Nombre del Cliente *</Label>
-          <Input
-            id="clientName"
-            value={clientName}
-            onChange={(e) => setClientName(e.target.value)}
-            placeholder="Nombre completo"
-            required
-          />
-        </div>
-        <div>
-          <Label htmlFor="clientPhone">Teléfono *</Label>
-          <Input
-            id="clientPhone"
-            value={clientPhone}
-            onChange={(e) => setClientPhone(e.target.value)}
-            placeholder="Número de teléfono"
-            required
-          />
-        </div>
-      </div>
+      <ClientInfoFields
+        clientName={clientName}
+        clientPhone={clientPhone}
+        onNameChange={setClientName}
+        onPhoneChange={setClientPhone}
+      />
 
-      <div className="space-y-4">
-        <Label>Plataformas Disponibles *</Label>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          {availablePlatforms.map((account) => {
-            const availableSpots = getAvailableSpots(account.platform);
-            const isSelected = selectedPlatforms.includes(account.platform);
-            return (
-              <div key={account.platform} className="relative">
-                <Button
-                  type="button"
-                  variant={isSelected ? "default" : "outline"}
-                  onClick={() => handlePlatformToggle(account.platform)}
-                  className={`w-full ${isSelected ? 'ring-2 ring-offset-2 ring-primary' : ''}`}
-                  disabled={availableSpots === 0 && !isSelected}
-                >
-                  {account.platform}
-                  <Badge 
-                    variant={availableSpots > 0 ? "default" : "destructive"}
-                    className="absolute -top-2 -right-2"
-                  >
-                    {availableSpots} disponible{availableSpots !== 1 ? 's' : ''}
-                  </Badge>
-                </Button>
-              </div>
-            );
-          })}
-        </div>
-      </div>
+      <PlatformSelection
+        availablePlatforms={availablePlatforms}
+        selectedPlatforms={selectedPlatforms}
+        onPlatformToggle={handlePlatformToggle}
+      />
 
       {selectedPlatforms.length > 0 && (
-        <div className="space-y-4 bg-gray-50 p-4 rounded-lg">
-          <h3 className="font-medium">PINs Asignados</h3>
-          <div className="grid grid-cols-2 gap-4">
-            {selectedPlatforms.map(platform => (
-              <div key={platform}>
-                <Label htmlFor={`pin-${platform}`}>{platform}</Label>
-                <Input
-                  id={`pin-${platform}`}
-                  value={pins[platform] || ""}
-                  onChange={(e) => {
-                    const value = e.target.value.replace(/\D/g, '').slice(0, 4);
-                    setPins(prev => ({
-                      ...prev,
-                      [platform]: value
-                    }));
-                  }}
-                  placeholder="PIN (4 dígitos)"
-                  required
-                  maxLength={4}
-                  pattern="\d{4}"
-                />
-              </div>
-            ))}
-          </div>
-
-          <div className="pt-4 border-t">
-            <div>
-              <Label htmlFor="manualPrice">Precio Regular *</Label>
-              <Input
-                id="manualPrice"
-                type="number"
-                step="0.01"
-                min="0"
-                value={manualPrice || ''}
-                onChange={(e) => setManualPrice(Number(e.target.value))}
-                placeholder="Ingrese el precio"
-                required
-                className="mb-2"
-              />
-            </div>
-            <div className="flex justify-between items-center text-green-600 font-bold">
-              <span>Precio con descuento (10%):</span>
-              <span>${(manualPrice * 0.9).toFixed(2)}</span>
-            </div>
-          </div>
-        </div>
+        <PinAssignment
+          selectedPlatforms={selectedPlatforms}
+          pins={pins}
+          onPinChange={(platform, value) => setPins(prev => ({ ...prev, [platform]: value }))}
+          manualPrice={manualPrice}
+          onManualPriceChange={setManualPrice}
+        />
       )}
 
       <Button
