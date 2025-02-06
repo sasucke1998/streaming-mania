@@ -1,6 +1,5 @@
-
 import { Card, CardContent } from "@/components/ui/card";
-import { Users, CreditCard, DollarSign, Wallet, TrendingUp, Activity } from "lucide-react";
+import { Users, CreditCard, DollarSign, Wallet, TrendingUp, Activity, Percent } from "lucide-react";
 
 interface StatsProps {
   totalClients: number;
@@ -25,6 +24,9 @@ export function Stats({
   averageClientValue = 0,
   showFinancialStats = false
 }: StatsProps) {
+  // Calculate payment rate
+  const paymentRate = totalClients > 0 ? ((paidClients / totalClients) * 100) : 0;
+
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       <Card>
@@ -59,6 +61,14 @@ export function Stats({
         </CardContent>
       </Card>
 
+      <Card>
+        <CardContent className="flex flex-col items-center justify-center p-6">
+          <Percent className="h-12 w-12 text-purple-500 mb-2" />
+          <h3 className="text-lg font-medium text-gray-600">Tasa de Pago</h3>
+          <p className="text-3xl font-bold text-purple-500">{paymentRate.toFixed(1)}%</p>
+        </CardContent>
+      </Card>
+
       {showFinancialStats && (
         <>
           <Card>
@@ -83,16 +93,6 @@ export function Stats({
               <TrendingUp className="h-12 w-12 text-orange-500 mb-2" />
               <h3 className="text-lg font-medium text-gray-600">Valor por Cliente</h3>
               <p className="text-3xl font-bold text-orange-500">${averageClientValue.toFixed(2)}</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="flex flex-col items-center justify-center p-6">
-              <Activity className="h-12 w-12 text-yellow-500 mb-2" />
-              <h3 className="text-lg font-medium text-gray-600">Tasa de Pago</h3>
-              <p className="text-3xl font-bold text-yellow-500">
-                {totalClients > 0 ? ((paidClients / totalClients) * 100).toFixed(1) : 0}%
-              </p>
             </CardContent>
           </Card>
         </>
