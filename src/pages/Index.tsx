@@ -126,22 +126,32 @@ export default function Index() {
         );
       case "accounts":
         return (
-          <PlatformAccounts
-            accountsByPlatform={accountsByPlatform}
-            openPlatforms={openPlatforms}
-            onTogglePlatform={togglePlatform}
-            onEdit={handleEditAccount}
-            onDelete={handleDeleteAccount}
-            onEditClient={(email, clientId, data) => {
-              handleUpdateClient(email, clientId, data);
-            }}
-            onAddClient={(email, data) => {
-              handleAddClient(email, data);
-            }}
-            onDeleteClient={(email, clientId) => {
-              handleDeleteAccountClient(email, clientId);
-            }}
-          />
+          <>
+            <PlatformAccounts
+              accountsByPlatform={accountsByPlatform}
+              openPlatforms={openPlatforms}
+              onTogglePlatform={togglePlatform}
+              onEdit={handleEditAccount}
+              onDelete={handleDeleteAccount}
+              onEditClient={(email, clientId, data) => {
+                handleUpdateClient(email, clientId, data);
+              }}
+              onAddClient={(email, data) => {
+                handleAddClient(email, data);
+              }}
+              onDeleteClient={(email, clientId) => {
+                handleDeleteAccountClient(email, clientId);
+              }}
+            />
+            <div className="mt-8">
+              <h2 className="mb-4 text-2xl font-bold">Todos los Clientes</h2>
+              <ClientList
+                clients={filteredClients}
+                onTogglePaid={handleTogglePaid}
+                onDeleteClient={handleDeleteDashboardClient}
+              />
+            </div>
+          </>
         );
       default:
         return null;
