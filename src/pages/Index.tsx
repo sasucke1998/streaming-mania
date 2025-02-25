@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Header } from "@/components/Header";
 import { ClientList } from "@/components/ClientList";
@@ -27,7 +28,7 @@ export default function Index() {
     handleNewAccount,
     handleAddClient,
     handleUpdateClient,
-    handleDeleteClient,
+    handleDeleteAccountClient,
     togglePlatform 
   } = useAccountManagement();
 
@@ -36,7 +37,7 @@ export default function Index() {
     setSearchQuery,
     filteredClients,
     handleTogglePaid,
-    handleDeleteClient,
+    handleDeleteClient: handleDeleteDashboardClient,
     handleExportToExcel,
     markAllUnpaid
   } = useClientManagement(accounts);
@@ -118,7 +119,7 @@ export default function Index() {
               <ClientList
                 clients={filteredClients}
                 onTogglePaid={handleTogglePaid}
-                onDeleteClient={handleDeleteClient}
+                onDeleteClient={handleDeleteDashboardClient}
               />
             </div>
           </>
@@ -138,7 +139,7 @@ export default function Index() {
               handleAddClient(email, data);
             }}
             onDeleteClient={(email, clientId) => {
-              handleDeleteClient(email, clientId);
+              handleDeleteAccountClient(email, clientId);
             }}
           />
         );

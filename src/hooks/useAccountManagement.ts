@@ -106,7 +106,7 @@ export const useAccountManagement = (initialAccounts: Account[] = initialAccount
     });
   };
 
-  const handleDeleteClient = (accountEmail: string, clientId: string) => {
+  const handleDeleteAccountClient = (accountEmail: string, clientId: string) => {
     setAccounts(prev => prev.map(account => {
       if (account.email === accountEmail) {
         return {
@@ -146,7 +146,7 @@ export const useAccountManagement = (initialAccounts: Account[] = initialAccount
     handleNewAccount,
     handleAddClient,
     handleUpdateClient,
-    handleDeleteClient,
+    handleDeleteAccountClient,
     togglePlatform
   };
 };
