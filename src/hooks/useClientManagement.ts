@@ -4,12 +4,12 @@ import { Account } from "@/types/account";
 import { useToast } from "@/hooks/use-toast";
 import * as XLSX from 'xlsx';
 
-export const useClientManagement = (initialAccounts: Account[]) => {
+export const useClientManagement = (initialAccounts: Account[] = []) => {
   const [accounts, setAccounts] = useState(initialAccounts);
   const [searchQuery, setSearchQuery] = useState("");
   const { toast } = useToast();
 
-  const allClients = accounts.flatMap(account => 
+  const allClients = (accounts || []).flatMap(account => 
     account.clients.map(client => ({
       ...client,
       platform: account.platform
@@ -23,7 +23,7 @@ export const useClientManagement = (initialAccounts: Account[]) => {
 
   const handleTogglePaid = (clientId: string) => {
     setAccounts(prevAccounts => 
-      prevAccounts.map(account => ({
+      (prevAccounts || []).map(account => ({
         ...account,
         clients: account.clients.map(client => 
           client.id === clientId
@@ -41,7 +41,7 @@ export const useClientManagement = (initialAccounts: Account[]) => {
 
   const handleDeleteClient = (clientId: string) => {
     setAccounts(prevAccounts => 
-      prevAccounts.map(account => ({
+      (prevAccounts || []).map(account => ({
         ...account,
         clients: account.clients.filter(client => client.id !== clientId)
       }))
@@ -76,7 +76,7 @@ export const useClientManagement = (initialAccounts: Account[]) => {
 
   const markAllUnpaid = () => {
     setAccounts(prevAccounts => 
-      prevAccounts.map(account => ({
+      (prevAccounts || []).map(account => ({
         ...account,
         clients: account.clients.map(client => ({
           ...client,
