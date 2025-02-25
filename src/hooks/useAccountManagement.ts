@@ -47,15 +47,81 @@ export const useAccountManagement = (initialAccounts: Account[] = initialAccount
   };
 
   const handleNewAccount = (data: { platform: string; email: string; password: string; cost: number }) => {
-    setAccounts([
-      ...accounts,
-      {
-        ...data,
-        paidUsers: 0,
-        totalUsers: 0,
-        clients: [],
-      },
-    ]);
+    const newAccount: Account = {
+      ...data,
+      paidUsers: 0,
+      totalUsers: 0,
+      clients: [],
+    };
+    setAccounts(prev => [...prev, newAccount]);
+    toast({
+      title: "Cuenta creada",
+      description: "La cuenta ha sido creada exitosamente",
+    });
+  };
+
+  const handleAddClient = (accountEmail: string, clientData: Omit<Account["clients"][0], "id" | "isPaid">) => {
+    setAccounts(prev => prev.map(account => {
+      if (account.email === accountEmail) {
+        const newClient = {
+          ...clientData,
+          id: crypto.randomUUID(),
+          isPaid: false,
+          visits: 0
+        };
+        
+        return {
+          ...account,
+          clients: [...account.clients, newClient],
+          totalUsers: account.totalUsers + 1
+        };
+      }
+      return account;
+    }));
+
+    toast({
+      title: "Cliente agregado",
+      description: "El cliente ha sido agregado exitosamente",
+    });
+  };
+
+  const handleUpdateClient = (accountEmail: string, clientId: string, data: Omit<Account["clients"][0], "id" | "isPaid">) => {
+    setAccounts(prev => prev.map(account => {
+      if (account.email === accountEmail) {
+        return {
+          ...account,
+          clients: account.clients.map(client => 
+            client.id === clientId
+              ? { ...client, ...data }
+              : client
+          )
+        };
+      }
+      return account;
+    }));
+
+    toast({
+      title: "Cliente actualizado",
+      description: "Los datos del cliente han sido actualizados exitosamente",
+    });
+  };
+
+  const handleDeleteClient = (accountEmail: string, clientId: string) => {
+    setAccounts(prev => prev.map(account => {
+      if (account.email === accountEmail) {
+        return {
+          ...account,
+          clients: account.clients.filter(client => client.id !== clientId),
+          totalUsers: account.totalUsers - 1
+        };
+      }
+      return account;
+    }));
+
+    toast({
+      title: "Cliente eliminado",
+      description: "El cliente ha sido eliminado exitosamente",
+    });
   };
 
   const togglePlatform = (platform: string) => {
@@ -78,6 +144,9 @@ export const useAccountManagement = (initialAccounts: Account[] = initialAccount
     handleUpdateAccount,
     handleDeleteAccount,
     handleNewAccount,
+    handleAddClient,
+    handleUpdateClient,
+    handleDeleteClient,
     togglePlatform
   };
 };

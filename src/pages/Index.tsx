@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Header } from "@/components/Header";
 import { ClientList } from "@/components/ClientList";
@@ -25,7 +24,10 @@ export default function Index() {
     handleEditAccount, 
     handleUpdateAccount, 
     handleDeleteAccount, 
-    handleNewAccount, 
+    handleNewAccount,
+    handleAddClient,
+    handleUpdateClient,
+    handleDeleteClient,
     togglePlatform 
   } = useAccountManagement();
 
@@ -130,13 +132,13 @@ export default function Index() {
             onEdit={handleEditAccount}
             onDelete={handleDeleteAccount}
             onEditClient={(email, clientId, data) => {
-              console.log("Edit client:", email, clientId, data);
+              handleUpdateClient(email, clientId, data);
             }}
             onAddClient={(email, data) => {
-              console.log("Add client:", email, data);
+              handleAddClient(email, data);
             }}
             onDeleteClient={(email, clientId) => {
-              console.log("Delete client:", email, clientId);
+              handleDeleteClient(email, clientId);
             }}
           />
         );
