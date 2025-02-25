@@ -104,34 +104,22 @@ export default function Index() {
         );
       case "accounts":
         return (
-          <div className="space-y-8">
-            <div>
-              <h2 className="mb-4 text-2xl font-bold">Cuentas por Plataforma</h2>
-              <PlatformAccounts
-                accountsByPlatform={accountsByPlatform}
-                openPlatforms={openPlatforms}
-                onTogglePlatform={togglePlatform}
-                onEdit={handleEditAccount}
-                onDelete={handleDeleteAccount}
-                onEditClient={(email, clientId, data) => {
-                  console.log("Edit client:", email, clientId, data);
-                }}
-                onAddClient={(email, data) => {
-                  console.log("Add client:", email, data);
-                }}
-                onDeleteClient={(email, clientId) => {
-                  console.log("Delete client:", email, clientId);
-                }}
-              />
-            </div>
-            <div>
-              <h2 className="mb-4 text-2xl font-bold">Crear Nuevo Combo</h2>
-              <ComboForm
-                availablePlatforms={availablePlatforms}
-                onSubmit={handleNewCombo}
-              />
-            </div>
-          </div>
+          <PlatformAccounts
+            accountsByPlatform={accountsByPlatform}
+            openPlatforms={openPlatforms}
+            onTogglePlatform={togglePlatform}
+            onEdit={handleEditAccount}
+            onDelete={handleDeleteAccount}
+            onEditClient={(email, clientId, data) => {
+              console.log("Edit client:", email, clientId, data);
+            }}
+            onAddClient={(email, data) => {
+              console.log("Add client:", email, data);
+            }}
+            onDeleteClient={(email, clientId) => {
+              console.log("Delete client:", email, clientId);
+            }}
+          />
         );
       default:
         return null;
