@@ -40,8 +40,13 @@ export default function Index() {
     return acc;
   }, {} as Record<string, typeof accounts>);
 
-  // Available platforms for combos
-  const availablePlatforms = Array.from(new Set(accounts.map(acc => acc.platform)));
+  // Available platforms for combos with their stats
+  const availablePlatforms = accounts.map(account => ({
+    platform: account.platform,
+    cost: account.cost,
+    totalUsers: account.totalUsers,
+    paidUsers: account.paidUsers
+  }));
 
   const handleNewCombo = (data: any) => {
     console.log("New combo data:", data);
