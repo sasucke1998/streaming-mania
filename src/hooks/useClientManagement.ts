@@ -4,12 +4,23 @@ import { Account } from "@/types/account";
 import { useToast } from "@/hooks/use-toast";
 import * as XLSX from 'xlsx';
 
+export interface ExtendedClient {
+  id: string;
+  name: string;
+  pin: string;
+  phone: string;
+  isPaid: boolean;
+  amountDue: number;
+  platform: string;
+  visits?: number;
+}
+
 export const useClientManagement = (initialAccounts: Account[] = []) => {
-  const [accounts, setAccounts] = useState(initialAccounts);
+  const [accounts, setAccounts] = useState<Account[]>(initialAccounts);
   const [searchQuery, setSearchQuery] = useState("");
   const { toast } = useToast();
 
-  const allClients = (accounts || []).flatMap(account => 
+  const allClients: ExtendedClient[] = (accounts || []).flatMap(account => 
     account.clients.map(client => ({
       ...client,
       platform: account.platform

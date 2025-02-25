@@ -10,10 +10,11 @@ import { useComboManagement } from "@/hooks/useComboManagement";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Stats } from "@/components/Stats";
+import { ComboFormData } from "@/types/combo";
 
 export default function Index() {
   const [activeView, setActiveView] = useState<"dashboard" | "accounts" | "combos">("dashboard");
-  const { accounts, setAccounts, isNewAccountDialogOpen, setIsNewAccountDialogOpen, openPlatforms, handleEditAccount, handleUpdateAccount, handleDeleteAccount, handleNewAccount, togglePlatform } = useAccountManagement([]);
+  const { accounts, setAccounts, isNewAccountDialogOpen, setIsNewAccountDialogOpen, openPlatforms, handleEditAccount, handleUpdateAccount, handleDeleteAccount, handleNewAccount, togglePlatform } = useAccountManagement();
   const {
     searchQuery,
     setSearchQuery,
@@ -24,7 +25,7 @@ export default function Index() {
     markAllUnpaid
   } = useClientManagement(accounts);
 
-  const { combos } = useComboManagement();
+  const { combos, handleCreateCombo } = useComboManagement();
 
   // Calculate basic stats
   const totalClients = filteredClients.length;
@@ -48,9 +49,16 @@ export default function Index() {
     paidUsers: account.paidUsers
   }));
 
-  const handleNewCombo = (data: any) => {
-    console.log("New combo data:", data);
-    // Implement combo creation logic here
+  const handleNewCombo = (data: ComboFormData) => {
+    handleCreateCombo({
+      ...data,
+      id: crypto.randomUUID()
+    });
+    
+    toast({
+      title: "Combo creado",
+      description: "El combo ha sido creado exitosamente"
+    });
   };
 
   return (

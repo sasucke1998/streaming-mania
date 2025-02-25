@@ -3,7 +3,19 @@ import { useState } from "react";
 import { Account } from "@/types/account";
 import { useToast } from "@/hooks/use-toast";
 
-export const useAccountManagement = (initialAccounts: Account[]) => {
+const initialAccountState: Account[] = [
+  {
+    platform: "Netflix",
+    email: "",
+    password: "",
+    cost: 0,
+    paidUsers: 0,
+    totalUsers: 0,
+    clients: []
+  }
+];
+
+export const useAccountManagement = (initialAccounts: Account[] = initialAccountState) => {
   const [accounts, setAccounts] = useState(initialAccounts);
   const [editingAccount, setEditingAccount] = useState<Account | null>(null);
   const [isNewAccountDialogOpen, setIsNewAccountDialogOpen] = useState(false);
