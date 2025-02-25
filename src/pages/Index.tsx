@@ -69,6 +69,12 @@ export default function Index() {
       case "dashboard":
         return (
           <>
+            <Stats
+              totalClients={totalClients}
+              paidClients={paidClients}
+              unpaidClients={unpaidClients}
+              totalCombos={combos.length}
+            />
             <div className="mb-6 flex items-center justify-between">
               <div className="flex gap-4">
                 <Input
@@ -134,12 +140,6 @@ export default function Index() {
         onNewAccount={() => setIsNewAccountDialogOpen(true)}
       />
       <main className="container mx-auto px-4 py-8">
-        <Stats
-          totalClients={totalClients}
-          paidClients={paidClients}
-          unpaidClients={unpaidClients}
-          totalCombos={combos.length}
-        />
         {renderContent()}
       </main>
     </div>
