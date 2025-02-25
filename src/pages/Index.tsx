@@ -12,10 +12,23 @@ import { Input } from "@/components/ui/input";
 import { Stats } from "@/components/Stats";
 import { useToast } from "@/hooks/use-toast";
 import { ComboFormData } from "@/types/combo";
+import { NewAccountDialog } from "@/components/NewAccountDialog";
 
 export default function Index() {
   const [activeView, setActiveView] = useState<"dashboard" | "accounts" | "combos">("dashboard");
-  const { accounts, setAccounts, isNewAccountDialogOpen, setIsNewAccountDialogOpen, openPlatforms, handleEditAccount, handleUpdateAccount, handleDeleteAccount, handleNewAccount, togglePlatform } = useAccountManagement();
+  const { 
+    accounts, 
+    setAccounts, 
+    isNewAccountDialogOpen, 
+    setIsNewAccountDialogOpen, 
+    openPlatforms, 
+    handleEditAccount, 
+    handleUpdateAccount, 
+    handleDeleteAccount, 
+    handleNewAccount, 
+    togglePlatform 
+  } = useAccountManagement();
+
   const {
     searchQuery,
     setSearchQuery,
@@ -142,6 +155,11 @@ export default function Index() {
       <main className="container mx-auto px-4 py-8">
         {renderContent()}
       </main>
+      <NewAccountDialog
+        open={isNewAccountDialogOpen}
+        onOpenChange={setIsNewAccountDialogOpen}
+        onSubmit={handleNewAccount}
+      />
     </div>
   );
 }
