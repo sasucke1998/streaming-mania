@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Header } from "@/components/Header";
 import { ClientList } from "@/components/ClientList";
@@ -10,6 +9,7 @@ import { useComboManagement } from "@/hooks/useComboManagement";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Stats } from "@/components/Stats";
+import { useToast } from "@/hooks/use-toast";
 import { ComboFormData } from "@/types/combo";
 
 export default function Index() {
@@ -26,6 +26,7 @@ export default function Index() {
   } = useClientManagement(accounts);
 
   const { combos, handleCreateCombo } = useComboManagement();
+  const { toast } = useToast();
 
   // Calculate basic stats
   const totalClients = filteredClients.length;
@@ -50,10 +51,7 @@ export default function Index() {
   }));
 
   const handleNewCombo = (data: ComboFormData) => {
-    handleCreateCombo({
-      ...data,
-      id: crypto.randomUUID()
-    });
+    handleCreateCombo(data);
     
     toast({
       title: "Combo creado",

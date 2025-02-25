@@ -1,19 +1,13 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { MessageCircle, Trash2, ChevronDown, ChevronUp } from "lucide-react";
+import { MessageCircle } from "lucide-react";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { Card } from "@/components/ui/card";
 
 interface Client {
   id: string;
@@ -42,33 +36,37 @@ export function ClientList({ clients, onTogglePaid, onDeleteClient }: ClientList
   return (
     <div className="rounded-md border mt-6">
       <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
-        <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-gray-50 hover:bg-gray-100">
-          <h3 className="text-lg font-semibold">Lista de Clientes</h3>
-          {isExpanded ? (
-            <ChevronUp className="h-5 w-5" />
-          ) : (
-            <ChevronDown className="h-5 w-5" />
-          )}
+        <CollapsibleTrigger className="flex items-center space-x-2 w-full p-4 text-left bg-gray-50 hover:bg-gray-100">
+          <div className="flex items-center space-x-2">
+            <svg
+              className="h-5 w-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 6h16M4 12h16M4 18h16"
+              />
+            </svg>
+            <h3 className="text-lg font-semibold">Lista de Clientes</h3>
+          </div>
         </CollapsibleTrigger>
-        <CollapsibleContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Nombre</TableHead>
-                <TableHead>Plataforma</TableHead>
-                <TableHead>PIN</TableHead>
-                <TableHead>Teléfono</TableHead>
-                <TableHead className="text-right">Acciones</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {clients.map((client) => (
-                <TableRow key={client.id}>
-                  <TableCell className="font-medium">{client.name}</TableCell>
-                  <TableCell>{client.platform}</TableCell>
-                  <TableCell>{client.pin}</TableCell>
-                  <TableCell>{client.phone}</TableCell>
-                  <TableCell className="text-right space-x-2">
+        <CollapsibleContent className="p-4">
+          <div className="space-y-4">
+            {clients.map((client) => (
+              <Card key={client.id} className="p-4">
+                <div className="flex justify-between items-center">
+                  <div className="space-y-1">
+                    <h4 className="text-lg font-semibold">{client.name}</h4>
+                    <p className="text-sm text-gray-600">
+                      Plataforma: {client.platform} | PIN: {client.pin} | Tel: {client.phone}
+                    </p>
+                  </div>
+                  <div className="flex space-x-2">
                     <Button
                       onClick={() => openWhatsApp(client.phone)}
                       variant="outline"
@@ -86,20 +84,11 @@ export function ClientList({ clients, onTogglePaid, onDeleteClient }: ClientList
                     >
                       {client.isPaid ? "Pagado" : "No Pagado"}
                     </Button>
-                    {onDeleteClient && (
-                      <Button
-                        onClick={() => onDeleteClient(client.id)}
-                        variant="destructive"
-                        size="sm"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
         </CollapsibleContent>
       </Collapsible>
     </div>
