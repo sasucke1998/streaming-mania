@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState } from "react";
 
 interface NewAccountDialogProps {
@@ -10,6 +11,17 @@ interface NewAccountDialogProps {
   onOpenChange: (open: boolean) => void;
   onSubmit: (data: { platform: string; email: string; password: string; cost: number }) => void;
 }
+
+const PLATFORMS = [
+  "Netflix",
+  "Disney+",
+  "HBO Max",
+  "Amazon Prime",
+  "Star+",
+  "Paramount+",
+  "Crunchyroll",
+  "Apple TV+"
+];
 
 export function NewAccountDialog({ open, onOpenChange, onSubmit }: NewAccountDialogProps) {
   const [formData, setFormData] = useState({
@@ -35,12 +47,21 @@ export function NewAccountDialog({ open, onOpenChange, onSubmit }: NewAccountDia
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="platform">Plataforma</Label>
-            <Input
-              id="platform"
+            <Select
               value={formData.platform}
-              onChange={(e) => setFormData({ ...formData, platform: e.target.value })}
-              required
-            />
+              onValueChange={(value) => setFormData({ ...formData, platform: value })}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Selecciona una plataforma" />
+              </SelectTrigger>
+              <SelectContent>
+                {PLATFORMS.map((platform) => (
+                  <SelectItem key={platform} value={platform}>
+                    {platform}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
