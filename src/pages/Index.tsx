@@ -68,34 +68,13 @@ export default function Index() {
     switch (activeView) {
       case "dashboard":
         return (
-          <div className="grid gap-8 md:grid-cols-2">
-            <div>
-              <h2 className="mb-4 text-2xl font-bold">Lista de Clientes</h2>
-              <ClientList
-                clients={filteredClients}
-                onTogglePaid={handleTogglePaid}
-                onDeleteClient={handleDeleteClient}
-              />
-            </div>
-            <div>
-              <h2 className="mb-4 text-2xl font-bold">Cuentas por Plataforma</h2>
-              <PlatformAccounts
-                accountsByPlatform={accountsByPlatform}
-                openPlatforms={openPlatforms}
-                onTogglePlatform={togglePlatform}
-                onEdit={handleEditAccount}
-                onDelete={handleDeleteAccount}
-                onEditClient={(email, clientId, data) => {
-                  console.log("Edit client:", email, clientId, data);
-                }}
-                onAddClient={(email, data) => {
-                  console.log("Add client:", email, data);
-                }}
-                onDeleteClient={(email, clientId) => {
-                  console.log("Delete client:", email, clientId);
-                }}
-              />
-            </div>
+          <div>
+            <h2 className="mb-4 text-2xl font-bold">Lista de Clientes</h2>
+            <ClientList
+              clients={filteredClients}
+              onTogglePaid={handleTogglePaid}
+              onDeleteClient={handleDeleteClient}
+            />
           </div>
         );
       case "accounts":
