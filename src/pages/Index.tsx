@@ -1,4 +1,5 @@
 
+import { useState } from "react";
 import { Header } from "@/components/Header";
 import { ClientList } from "@/components/ClientList";
 import { ComboForm } from "@/components/ComboForm";
@@ -11,7 +12,8 @@ import { Input } from "@/components/ui/input";
 import { Stats } from "@/components/Stats";
 
 export default function Index() {
-  const { accounts, handleExportAccountsToExcel } = useAccountManagement();
+  const [activeView, setActiveView] = useState<"dashboard" | "accounts" | "combos">("dashboard");
+  const { accounts, setAccounts, isNewAccountDialogOpen, setIsNewAccountDialogOpen, openPlatforms, handleEditAccount, handleUpdateAccount, handleDeleteAccount, handleNewAccount, togglePlatform } = useAccountManagement([]);
   const {
     searchQuery,
     setSearchQuery,
@@ -29,9 +31,30 @@ export default function Index() {
   const paidClients = filteredClients.filter(client => client.isPaid).length;
   const unpaidClients = totalClients - paidClients;
 
+  // Organize accounts by platform
+  const accountsByPlatform = accounts.reduce((acc, account) => {
+    if (!acc[account.platform]) {
+      acc[account.platform] = [];
+    }
+    acc[account.platform].push(account);
+    return acc;
+  }, {} as Record<string, typeof accounts>);
+
+  // Available platforms for combos
+  const availablePlatforms = Array.from(new Set(accounts.map(acc => acc.platform)));
+
+  const handleNewCombo = (data: any) => {
+    console.log("New combo data:", data);
+    // Implement combo creation logic here
+  };
+
   return (
     <div className="min-h-screen bg-gray-100">
-      <Header />
+      <Header
+        activeView={activeView}
+        setActiveView={setActiveView}
+        onNewAccount={() => setIsNewAccountDialogOpen(true)}
+      />
       <main className="container mx-auto px-4 py-8">
         <Stats
           totalClients={totalClients}
@@ -52,7 +75,7 @@ export default function Index() {
             <Button onClick={handleExportToExcel}>
               Exportar Clientes
             </Button>
-            <Button onClick={handleExportAccountsToExcel}>
+            <Button onClick={() => console.log("Exportar cuentas")}>
               Exportar Cuentas
             </Button>
             <Button
@@ -76,13 +99,31 @@ export default function Index() {
 
           <div>
             <h2 className="mb-4 text-2xl font-bold">Cuentas por Plataforma</h2>
-            <PlatformAccounts />
+            <PlatformAccounts
+              accountsByPlatform={accountsByPlatform}
+              openPlatforms={openPlatforms}
+              onTogglePlatform={togglePlatform}
+              onEdit={handleEditAccount}
+              onDelete={handleDeleteAccount}
+              onEditClient={(email, clientId, data) => {
+                console.log("Edit client:", email, clientId, data);
+              }}
+              onAddClient={(email, data) => {
+                console.log("Add client:", email, data);
+              }}
+              onDeleteClient={(email, clientId) => {
+                console.log("Delete client:", email, clientId);
+              }}
+            />
           </div>
         </div>
 
         <div className="mt-8">
           <h2 className="mb-4 text-2xl font-bold">Crear Nuevo Combo</h2>
-          <ComboForm />
+          <ComboForm
+            availablePlatforms={availablePlatforms}
+            onSubmit={handleNewCombo}
+          />
         </div>
       </main>
     </div>
