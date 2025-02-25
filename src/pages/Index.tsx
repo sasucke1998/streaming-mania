@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Header } from "@/components/Header";
 import { ClientList } from "@/components/ClientList";
@@ -51,7 +52,11 @@ export default function Index() {
   }));
 
   const handleNewCombo = (data: ComboFormData) => {
-    handleCreateCombo(data);
+    handleCreateCombo({
+      name: data.clientName,
+      platforms: data.selectedPlatforms,
+      cost: data.manualPrice
+    });
     
     toast({
       title: "Combo creado",
