@@ -68,14 +68,39 @@ export default function Index() {
     switch (activeView) {
       case "dashboard":
         return (
-          <div>
-            <h2 className="mb-4 text-2xl font-bold">Lista de Clientes</h2>
-            <ClientList
-              clients={filteredClients}
-              onTogglePaid={handleTogglePaid}
-              onDeleteClient={handleDeleteClient}
-            />
-          </div>
+          <>
+            <div className="mb-6 flex items-center justify-between">
+              <div className="flex gap-4">
+                <Input
+                  type="search"
+                  placeholder="Buscar cliente..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-64"
+                />
+                <Button onClick={handleExportToExcel}>
+                  Exportar Clientes
+                </Button>
+                <Button onClick={() => console.log("Exportar cuentas")}>
+                  Exportar Cuentas
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={markAllUnpaid}
+                >
+                  Marcar Todos Como Impagos
+                </Button>
+              </div>
+            </div>
+            <div>
+              <h2 className="mb-4 text-2xl font-bold">Lista de Clientes</h2>
+              <ClientList
+                clients={filteredClients}
+                onTogglePaid={handleTogglePaid}
+                onDeleteClient={handleDeleteClient}
+              />
+            </div>
+          </>
         );
       case "accounts":
         return (
@@ -127,31 +152,6 @@ export default function Index() {
           unpaidClients={unpaidClients}
           totalCombos={combos.length}
         />
-
-        <div className="mb-6 flex items-center justify-between">
-          <div className="flex gap-4">
-            <Input
-              type="search"
-              placeholder="Buscar cliente..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-64"
-            />
-            <Button onClick={handleExportToExcel}>
-              Exportar Clientes
-            </Button>
-            <Button onClick={() => console.log("Exportar cuentas")}>
-              Exportar Cuentas
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={markAllUnpaid}
-            >
-              Marcar Todos Como Impagos
-            </Button>
-          </div>
-        </div>
-
         {renderContent()}
       </main>
     </div>
